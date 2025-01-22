@@ -1,0 +1,48 @@
+
+  .chatWindow__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1em;
+    border-bottom: 1px solid #ddd;
+    background-color: #f8f9fa;
+    width: 73vw;
+  }
+  .type-of-chat{
+    display: flex;
+    gap: 1.8rem;
+    border: 1px solid black;
+    text-align: center;
+    border-radius: 2rem;
+    /* padding:1rem; */
+    box-sizing: border-box;
+  }
+  .type-of-chat:hover{
+    cursor: pointer;
+  }
+  .chat-contact-search{
+    display: flex;
+    gap: 1.1rem;
+  }
+  .selected{
+    /* border: 1px solid blue; */
+    border-radius: 2rem;
+    padding:0.7rem 1.5rem;
+    box-sizing: border-box;
+    background-color: #0b81ff;
+    color: #fff;
+    /* transition: background 0.1s; */
+    
+  }
+  .not-selected{
+    padding-top:0.7rem; 
+    padding-bottom: 0.7rem;
+    box-sizing: border-box;
+    /* transition: background 0.2s; */
+  }
+  .Normal{
+    padding-left: 1.3rem;
+  }
+  .Collab{
+    padding-right: 1.3rem;
+  }

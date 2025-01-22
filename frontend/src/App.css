@@ -1,0 +1,41 @@
+.app {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+}
+
+.app__body {
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 0px 2px;
+  width: 100%;
+  min-height: 100%;
+}
+@media screen and (max-width: 768px) {
+  .app__body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    flex: 0.2;
+  }
+
+  .chatWindow {
+    flex: 0.8;
+  }
+}
+.no-arrow {
+  -moz-appearance: textfield;
+}
+.no-arrow::-webkit-inner-spin-button {
+  display: none;
+}
+.no-arrow::-webkit-outer-spin-button,
+.no-arrow::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

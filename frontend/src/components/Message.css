@@ -1,0 +1,32 @@
+.message {
+    margin-bottom: 1em;
+    padding-left: 1em;
+    border-radius: 5px;
+    background-color: #fff;
+    max-width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: -1em;
+    font-size: small;
+  }
+  
+  .message__sender {
+    margin-left: auto;
+    background-color: #dcf8c6;
+  }
+  .message-metadata{
+            align-self: end;
+            display: flex;
+            align-items: end;
+            gap: 1em;
+  }
+  .message-send-time{
+          align-self: end;
+          font-size: 0.9em;
+          color: #636060;
+          padding-right: 1em;
+  }
+  .message-status{
+          font-size: 0.9em;
+          color: #1b1bbe;
+  } 

@@ -1,0 +1,284 @@
+/* Login Container */
+.container-login-signUp{
+    margin: 1rem 0;
+    min-width: 100%;
+    min-height: 120%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-container {
+    background: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 600px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Header */
+.form-title {
+    color: #333;
+    margin: 2rem 0;
+    font-size: 1.8em;
+}
+
+/* Form Inputs */
+.login-form form,
+.signup-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    text-align: left;
+    font-size: 0.9em;
+    color: #555;
+}
+
+input {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: 0.3s ease;
+}
+
+input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Avatar Section */
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.avatar {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #8281814e;
+    border: 1px solid #8e7b7b85;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+.avatar:hover{
+    cursor: pointer;
+    background-color: #70707095;
+}
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-color: transparent;
+}
+
+.upload-icon {
+    position: absolute;
+    bottom: 20%;
+    right: 35%;
+    background: #007bff;
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3em;
+    cursor: pointer;
+    z-index: 100;
+    display: none;
+    transition: all 0.3s linear;
+    
+}
+
+.avatar:hover .upload-icon {
+    background: #0056b3;
+    display: block;
+    box-sizing: border-box;
+    padding-top: 3px;
+    text-align: center;
+}
+
+/* Buttons */
+button {
+    padding: 12px;
+    font-size: 1.1em;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.switch-link {
+    background: none;
+    color: #007bff;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.avatar-upload-active {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(1px);
+  transition: all 0.3s ease-in-out;
+  opacity: 1;
+}
+.avatar-upload-active:hover{
+  opacity: 0.5;
+}
+
+.switch-link:hover {
+    color: #fff;
+}
+
+/* Error Message */
+.error-message {
+    font-size: 0.85em;
+    color: red;
+    text-align: left;
+}
+
+.switch-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .switch-option div {
+    margin-right: 10px;
+    font-weight: bold;
+  }
+  
+.success-message {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    background-color: #12e844;
+    color: #dde7df;
+    border: 1px solid #c3e6cb;
+    padding: 1rem;
+    border-radius: 5px;
+    text-align: center;
+  }
+  /* General Container for OTP Page */
+.otp-page {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .otp-page h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  /* Form Styling */
+  .otp-page form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .otp-page label {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  
+  .otp-page input {
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .otp-page input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Button Styling */
+  .otp-page button {
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .otp-page button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Error and Success Messages */
+  .otp-page .error-message {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+  
+  .otp-page .success-message {
+    color: #2ecc71;
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+  
+  /* Optional Recaptcha Container */
+  #recaptcha-container {
+    margin-top: 15px;
+    text-align: center;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 500px) {
+    .otp-page {
+      width: 90%;
+      padding: 15px;
+    }
+  
+    .otp-page h2 {
+      font-size: 1.5rem;
+    }
+  
+    .otp-page input,
+    .otp-page button {
+      font-size: 0.9rem;
+    }
+  }
+  

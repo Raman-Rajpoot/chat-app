@@ -1,0 +1,17 @@
+.CollabChatWindow{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    transition: 0.1s;
+    background-color: #d2d2d2;
+}
+.widthBar{
+    position: fixed;
+    right: 0;
+    padding: 1rem;
+    top:4vw;
+}
+.fullWindow{
+    top: 0;
+    
+}

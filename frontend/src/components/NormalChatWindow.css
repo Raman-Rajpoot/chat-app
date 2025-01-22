@@ -1,0 +1,55 @@
+.NormalchatWindow {
+  flex: 0.8;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.NormalchatWindow__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1em;
+  border-bottom: 1px solid #ddd;
+  background-color: #f8f9fa;
+}
+
+.NormalchatWindow__body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #e5ddd5;
+}
+
+.NormalchatWindow__footer {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background-color: #ffffff;
+}
+.NormalchatWindow__footer form{
+  display: flex;
+}
+.NormalchatWindow__footer input {
+  padding: 1px;
+  border: none;
+  outline: none;
+  border-radius: 20px;
+  /* margin-right: 10px; */
+  width: 50vw;
+}
+
+.NormalchatWindow__footer button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #0b81ff;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 100px;
+}
+
+.NormalchatWindow__footer button:hover {
+  background-color: #005ecb;
+}
