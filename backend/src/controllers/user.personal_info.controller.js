@@ -3,7 +3,8 @@ import { User } from "../models/user.model.js";
 import { OTP } from "../models/otp.model.js";
 // import generateOTP from "../utils/otpGenerator.utils.js";
 import sendOTP from "../utils/optSend.utils.js";
-
+import Fuse from "fuse.js";
+import { Chat } from "../models/chat.model.js";
 const sendOTPRoute = async (req, res) => {
     const { name, email, password } = req.body;
   
@@ -212,6 +213,17 @@ const Login = async (req, res) => {
   }
 };
 
+const logout = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Logout Error:", err);
+      return res.status(500).json({ message: "Logout failed" });
+    }
+    res.clearCookie("connect.sid"); // Clear session cookie
+    return res.status(200).json({ message: "Logged out successfully" });
+  });
+};
+
 const getUser = async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -225,4 +237,97 @@ const getUser = async (req, res) => {
   });
 };
 
-export { SignUp, Login, getUser, sendOTPRoute, verifyOTPRoute };
+
+const searchUserFuzzy = async (req, res) => {
+  const { search } = req.body;
+  if (!search) {
+    return res.status(400).json({ message: "Search field is empty" });
+  }
+  
+  try {
+    
+    const users = await User.find({}).select("-password -refreshToken");
+    
+    // Configure Fuse.js options
+    const fuseOptions = {
+      keys: ["name", "email"],
+      threshold: 0.3, // Lower threshold means stricter matching; adjust as needed
+    };
+    const fuse = new Fuse(users, fuseOptions);
+    
+    // Perform fuzzy search on the users array
+    const results = fuse.search(search).map(result => result.item);
+    
+    return res.status(200).json({
+      users: results,
+      message: "Users retrieved successfully (fuzzy search)"
+    });
+  } catch (error) {
+    console.error("Error during fuzzy search:", error);
+    return res.status(500).json({ message: "Error during search" });
+  }
+};
+
+
+const searchMyChat = async (req, res) => {
+  const { search } = req.body;
+  // console.log("Search term:", search);
+  if (!search) {
+    return res.status(400).json({ message: "Search field is empty" });
+  }
+
+  try {
+   
+    const chats = await Chat.find({ members: req.user._id })
+      .populate("members", "name email")
+      .lean();
+    
+
+    if (!chats || chats.length === 0) {
+      return res.status(404).json({ message: "No chats found" });
+    }
+
+    const chatsForSearch = chats.map(chat => {
+      if (chat.isGroupChat) {
+        return { ...chat, searchText: chat.groupName || chat.chatName || "" };
+      } else {
+        // For one-on-one chats, find the other member.
+        const otherMember = chat.members.find(
+          member => member._id.toString() !== req.user._id.toString()
+        );
+        const searchText = otherMember
+          ? `${otherMember.name} ${otherMember.email || ""}`
+          : "";
+        return { ...chat, searchText };
+      }
+    });
+    // console.log("Chats prepared for search:", chatsForSearch);
+
+    // Configure Fuse.js options to use the unified searchText.
+    const options = {
+      keys: ["searchText"],
+      threshold: 0.3, // Adjust threshold (lower is stricter)
+    };
+
+    const fuse = new Fuse(chatsForSearch, options);
+    
+    const results = fuse.search(search);
+    // console.log("Fuse search results:", results);
+
+    // Extract chat objects from Fuse.js results.
+    const filteredChats = results.map(result => result.item);
+    // console.log("Filtered chats:", filteredChats);
+
+    return res.status(200).json({
+      chats: filteredChats,
+      message: "Chats retrieved successfully",
+    });
+  } catch (error) {
+    console.error("Error during fuzzy searchMyChat:", error);
+    return res.status(500).json({ message: "Error during searchMyChat" });
+  }
+};
+
+ 
+
+export { SignUp, Login, getUser, sendOTPRoute, verifyOTPRoute,logout ,searchUserFuzzy, searchMyChat};
