@@ -1,183 +1,276 @@
-import React, { useEffect, useState } from 'react';
-import './Login.css';
+import React, { useEffect, useState } from "react";
+import "./Login.css";
 
 function Login() {
   const [isLogin, setIsLogin] = useState(true);
-  const [name, setName] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [bio, setBio] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState(""); // Using email instead of mobile
+  const [bio, setBio] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [isOtpPage, setIsOtpPage] = useState(false);
   const [otp, setOtp] = useState("");
   const [avatar, setAvatar] = useState(null);
-  const [fieldError , setFieldError] = useState({
-    nameError : '',
-    mobileError : '',
-    passwordError : '',
-    confirmPasswordError : '',
+  const [fieldError, setFieldError] = useState({
+    nameError: "",
+    emailError: "",
+    passwordError: "",
+    confirmPasswordError: "",
   });
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
   const [fileImage, setFileImage] = useState(0);
 
   useEffect(() => {
-    const avatarUploadElement = document.querySelector('.avatar-img');
-  
+    const avatarUploadElement = document.querySelector(".avatar-img");
     if (avatarUploadElement) {
       if (fileImage) {
-        avatarUploadElement.classList.add('avatar-upload-active');
+        avatarUploadElement.classList.add("avatar-upload-active");
       } else {
-        avatarUploadElement.classList.remove('avatar-upload-active');
+        avatarUploadElement.classList.remove("avatar-upload-active");
       }
     }
   }, [fileImage]);
 
+  // Upload avatar image
   const handleAvatarUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-        
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        const maxSize = 5 * 1024 * 1024; // 5MB
-
-        if (!allowedTypes.includes(file.type)) {
-            setError("Please upload a valid image (JPEG, PNG, GIF).");
-            return;
-        }
-
-        if (file.size > maxSize) {
-            setError("File size exceeds 5MB limit.");
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            setAvatar(reader.result);
-            setError('');  // Clear any previous error if the file is valid
-        };
-        setFileImage("uploaded");
-        reader.readAsDataURL(file);
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (!allowedTypes.includes(file.type)) {
+        setError("Please upload a valid image (JPEG, PNG, GIF).");
+        return;
+      }
+      if (file.size > maxSize) {
+        setError("File size exceeds 5MB limit.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setAvatar(reader.result);
+        setError("");
+      };
+      setFileImage("uploaded");
+      reader.readAsDataURL(file);
     }
-};
+  };
 
-const handleVerifyOtp = () => {
-  
-};
-  const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    if (!mobile || !password) {
-      setError('Please fill in all fields');
+  // Send OTP to email for signup verification
+  const handleSendOtp = async () => {
+    if (!email || !password || !name) {
+      setError("Please fill in Name, Email, and Password to get OTP");
       return;
     }
-    if(fieldError.confirmPasswordError || fieldError.mobileError){
-      setError("Voilate Conditions! Enter valid input");
-      return ;
+    
+    try {
+      // First validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError("Please enter a valid email address");
+        return;
+      }
+  
+      // Send request to get OTP
+      const response = await fetch("http://localhost:8000/user/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        setSuccessMessage(data.message);
+        setIsOtpPage(true);
+        setError("");
+      } else {
+        setError(data.message || "Error sending OTP");
+      }
+    } catch (err) {
+      console.error("Error sending OTP:", err);
+      setError("Error connecting to server for OTP");
     }
-    console.log('Login Details:', { mobile, password });
-    showSuccessMessage('Login successful!');
-    resetFields();
+  };
+  
+  // Verify OTP
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      setError("Please enter OTP");
+      return;
+    }
+    
+    try {
+      // Send OTP for verification
+      const response = await fetch("http://localhost:8000/user/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          email: email,  // Make sure email is included
+          otp: otp      // Use correct field name expected by backend
+        }),
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        setSuccessMessage("OTP verified successfully");
+        setIsOtpPage(false);
+        setError("");
+      } else {
+        setError(data.message || "Invalid OTP");
+      }
+    } catch (err) {
+      console.error("Error verifying OTP:", err);
+      setError("Error connecting to server for OTP verification");
+    }
+  };
+  
+  // Login API call
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+    if (fieldError.emailError || fieldError.passwordError) {
+      setError("Please correct the errors before submitting");
+      return;
+    }
+    try {
+      const response = await fetch("http://localhost:8000/user/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setSuccessMessage(data.message || "Login successful!");
+        // Optionally store tokens in localStorage or cookies here
+        resetFields();
+      } else {
+        setError(data.message || "Login failed");
+      }
+    } catch (err) {
+      console.error("Error during login:", err);
+      setError("Error connecting to server for login");
+    }
   };
 
-  // Check Error : 
+  // Field validation for various inputs
   const fieldValidation = (e, field) => {
     const value = e.target.value;
-
-    if (field === 'mobile') {
-      const regMobile = /^(\+)?(0|91)?[1-9][0-9]{9}$/;
-      console.log(value, e.target.value)
-      const regNumber = /^[0-9]+$/;
-      if(regNumber.test(value)){
-        setMobile(value);
-      }
-      else{
-        setFieldError(prev => ({
+    if (field === "email") {
+      setEmail(value);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        setFieldError((prev) => ({
           ...prev,
-          mobileError: 'Enter Valid valid 0-9',
-        }));
-        return ;
-      } 
-      if (!regMobile.test(value)) {
-        setFieldError(prev => ({
-          ...prev,
-          mobileError: 'Mobile length must be 10 and valid format',
+          emailError: "Please enter a valid email address",
         }));
       } else {
-        
-        setFieldError(prev => ({
-          ...prev,
-          mobileError: '',
-        }));
+        setFieldError((prev) => ({ ...prev, emailError: "" }));
       }
-    } else if (field === 'password') {
+    } else if (field === "password") {
       setPassword(value);
-      const regPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+      const regPassword =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
       if (!regPassword.test(value)) {
-        setFieldError(prev => ({
+        setFieldError((prev) => ({
           ...prev,
-          passwordError: 'Password must be Strong!!',
+          passwordError: "Password must be strong!",
         }));
       } else {
-        setFieldError(prev => ({
-          ...prev,
-          passwordError: '',
-        }));
+        setFieldError((prev) => ({ ...prev, passwordError: "" }));
       }
-    } else if (field === 'confirmPassword') {
+    } else if (field === "confirmPassword") {
       setConfirmPassword(value);
       if (value !== password) {
-        setFieldError(prev => ({
+        setFieldError((prev) => ({
           ...prev,
-          confirmPasswordError: 'Passwords do not match!',
+          confirmPasswordError: "Passwords do not match!",
         }));
       } else {
-        setFieldError(prev => ({
-          ...prev,
-          confirmPasswordError: '',
-        }));
+        setFieldError((prev) => ({ ...prev, confirmPasswordError: "" }));
       }
-    } else if (field === 'name') {
+    } else if (field === "name") {
       setName(value);
       if (value.length < 3) {
-        setFieldError(prev => ({
+        setFieldError((prev) => ({
           ...prev,
-          nameError: 'Name must contain at least 3 characters',
+          nameError: "Name must contain at least 3 characters",
         }));
       } else {
-        setFieldError(prev => ({
-          ...prev,
-          nameError: '',
-        }));
+        setFieldError((prev) => ({ ...prev, nameError: "" }));
       }
     }
   };
-const submitSignUp = (e)=>{
+
+  // Signup API call
+  
+const submitSignUp = async (e) => {
   e.preventDefault();
-  if(fieldError.name || fieldError.passwordError || fieldError.confirmPasswordError || fieldError.mobileError){
-    setError("Voilate Conditions! Enter valid input");
-    return 0;
+  if (
+    fieldError.nameError ||
+    fieldError.passwordError ||
+    fieldError.confirmPasswordError ||
+    fieldError.emailError
+  ) {
+    setError("Please correct the errors before submitting");
+    return;
   }
-  console.log('Signup Details:', { name, mobile, bio, avatar });
-  showSuccessMessage('Signup successful!');
-  resetFields();
-}
-const resetFields = () => {
-  setName('');
-  setMobile('');
-  setBio('');
-  setPassword('');
-  setConfirmPassword('');
-  setError('');
-  setAvatar(null);
+  
+  if (password !== confirmPassword) {
+    setError("Passwords do not match");
+    return;
+  }
+
+  try {
+    // Include verified OTP in signup request
+    const response = await fetch("http://localhost:8000/user/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        name, 
+        email, 
+        bio, 
+        password, 
+        enteredOTP: otp  // Match backend expectation for OTP field
+      }),
+    });
+    
+    const data = await response.json();
+    if (response.ok) {
+      setSuccessMessage(data.message || "Signup successful!");
+      resetFields();
+    } else {
+      setError(data.message || "Signup failed");
+    }
+  } catch (err) {
+    console.error("Error during signup:", err);
+    setError("Error connecting to server for signup");
+  }
 };
-const showSuccessMessage = (message) => {
-  setSuccessMessage(message);
-  setTimeout(() => {
-    setSuccessMessage('');
-  }, 3000); // Hides the message after 3 seconds
-};
+
+  const resetFields = () => {
+    setName("");
+    setEmail("");
+    setBio("");
+    setPassword("");
+    setConfirmPassword("");
+    setError("");
+    setAvatar(null);
+    setOtp("");
+  };
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  };
+
   return (
-    <div className='container-login-signUp'>
-       {isOtpPage ? (
+    <div className="container-login-signUp">
+      {isOtpPage ? (
         <div className="otp-page">
           <h2 className="form-title">Verify OTP</h2>
           <form>
@@ -194,128 +287,173 @@ const showSuccessMessage = (message) => {
             </button>
           </form>
           {error && <p className="error-message">{error}</p>}
-          {successMessage && <p className="success-message">{successMessage}</p>}
-        </div>
-      ) :
-    <div className="login-container">
-      {isLogin ? (
-        <div className="login-form">
-          <h2 className="form-title">Login</h2>
-          <form onSubmit={handleLoginSubmit}>
-            <label htmlFor="login-mobile">Mobile:</label>
-            <input
-              type="tel"
-              id="login-mobile"
-              value={mobile}
-              required
-              onChange={(e) => fieldValidation(e, 'mobile')}
-            />
-            {fieldError.mobileError && <p className="error-message">{fieldError.mobileError}</p>}
-
-            <label htmlFor="login-password">Password:</label>
-            <input
-              type="password"
-              id="login-password"
-              value={password}
-              required
-              onChange={(e) => fieldValidation(e, 'password')}
-            />
-            {fieldError.passwordError && <p className="error-message">{fieldError.passwordError}</p>}
-
-            {error && <p className="error-message">{error}</p>}
-            <button type="submit">Submit</button>
-          </form>
-          <div className="switch-option">
-            <div>OR </div>
-            <button onClick={() => setIsLogin(false)} className="switch-link">Sign Up Instead</button>
-          </div>
+          {successMessage && (
+            <p className="success-message">{successMessage}</p>
+          )}
         </div>
       ) : (
-        <div className="signup-form">
-          <h2 className="form-title">Sign Up</h2>
-          <form onSubmit={submitSignUp}>
-            <div className="avatar-section">
-              <div className="avatar">
-                <img
-                  src={avatar || 'https://via.placeholder.com/100'}
-                  alt=" "
-                  className="avatar-img"
-                  onClick={() => document.getElementById('avatar-upload').click()}
+        <div className="login-container">
+          {isLogin ? (
+            <div className="login-form">
+              <h2 className="form-title">Login</h2>
+              <form onSubmit={handleLoginSubmit}>
+                <label htmlFor="login-email">Email:</label>
+                <input
+                  type="email"
+                  id="login-email"
+                  value={email}
+                  required
+                  onChange={(e) => fieldValidation(e, "email")}
                 />
-                <p className='upload-icon' onClick={ () => document.getElementById('avatar-upload').click()}>+</p>
-                { (
-                  <input
-                    type="file"
-                    id="avatar-upload"
-                    style={{ display: 'none' }}
-                    onChange={handleAvatarUpload}
-                  />
+                {fieldError.emailError && (
+                  <p className="error-message">{fieldError.emailError}</p>
                 )}
+
+                <label htmlFor="login-password">Password:</label>
+                <input
+                  type="password"
+                  id="login-password"
+                  value={password}
+                  required
+                  onChange={(e) => fieldValidation(e, "password")}
+                />
+                {fieldError.passwordError && (
+                  <p className="error-message">{fieldError.passwordError}</p>
+                )}
+
+                {error && <p className="error-message">{error}</p>}
+                <button type="submit">Login</button>
+              </form>
+              <div className="switch-option">
+                <div>OR</div>
+                <button
+                  onClick={() => {
+                    setIsLogin(false);
+                    resetFields();
+                  }}
+                  className="switch-link"
+                >
+                  Sign Up Instead
+                </button>
               </div>
             </div>
-            <label htmlFor="signup-name">Name:</label>
-            <input
-              type="text"
-              id="signup-name"
-              value={name}
-              required
-              onChange={(e) => fieldValidation(e, 'name')}
-            />
-            {fieldError.nameError && <p className="error-message">{fieldError.nameError}</p>}
+          ) : (
+            <div className="signup-form">
+              <h2 className="form-title">Sign Up</h2>
+              <form onSubmit={submitSignUp}>
+                <div className="avatar-section">
+                  <div className="avatar">
+                    <img
+                      src={avatar || "https://via.placeholder.com/100"}
+                      alt="Avatar"
+                      className="avatar-img"
+                      onClick={() =>
+                        document.getElementById("avatar-upload").click()
+                      }
+                    />
+                    <p
+                      className="upload-icon"
+                      onClick={() =>
+                        document.getElementById("avatar-upload").click()
+                      }
+                    >
+                      +
+                    </p>
+                    <input
+                      type="file"
+                      id="avatar-upload"
+                      style={{ display: "none" }}
+                      onChange={handleAvatarUpload}
+                    />
+                  </div>
+                </div>
+                <label htmlFor="signup-name">Name:</label>
+                <input
+                  type="text"
+                  id="signup-name"
+                  value={name}
+                  required
+                  onChange={(e) => fieldValidation(e, "name")}
+                />
+                {fieldError.nameError && (
+                  <p className="error-message">{fieldError.nameError}</p>
+                )}
 
-            <label htmlFor="signup-mobile">Mobile:</label>
-            <input
-              type="text"
-              id="signup-mobile"
-              value={mobile}
-              required
-              onChange={(e) => fieldValidation(e, 'mobile')}
-            />
-            {fieldError.mobileError && <p className="error-message">{fieldError.mobileError}</p>}
+                <label htmlFor="signup-email">Email:</label>
+                <input
+                  type="email"
+                  id="signup-email"
+                  value={email}
+                  required
+                  onChange={(e) => fieldValidation(e, "email")}
+                />
+                {fieldError.emailError && (
+                  <p className="error-message">{fieldError.emailError}</p>
+                )}
 
-            <label htmlFor="signup-bio">Bio:</label>
-            <input
-              type="text"
-              id="signup-bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-            />
+                <label htmlFor="signup-bio">Bio:</label>
+                <input
+                  type="text"
+                  id="signup-bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                />
 
-            <label htmlFor="signup-password">Password:</label>
-            <input
-              type="password"
-              id="signup-password"
-              value={password}
-              required
-              onChange={(e) => fieldValidation(e, 'password')}
-            />
-            {fieldError.passwordError && <p className="error-message">{fieldError.passwordError}</p>}
+                <label htmlFor="signup-password">Password:</label>
+                <input
+                  type="password"
+                  id="signup-password"
+                  value={password}
+                  required
+                  onChange={(e) => fieldValidation(e, "password")}
+                />
+                {fieldError.passwordError && (
+                  <p className="error-message">{fieldError.passwordError}</p>
+                )}
 
-            <label htmlFor="signup-confirmPassword">Confirm Password:</label>
-            <input
-              type="password"
-              id="signup-confirmPassword"
-              value={confirmPassword}
-              required
-              onChange={(e) => fieldValidation(e, 'confirmPassword')}
-            />
-            {fieldError.confirmPasswordError && <p className="error-message">{fieldError.confirmPasswordError}</p>}
+                <label htmlFor="signup-confirmPassword">
+                  Confirm Password:
+                </label>
+                <input
+                  type="password"
+                  id="signup-confirmPassword"
+                  value={confirmPassword}
+                  required
+                  onChange={(e) => fieldValidation(e, "confirmPassword")}
+                />
+                {fieldError.confirmPasswordError && (
+                  <p className="error-message">
+                    {fieldError.confirmPasswordError}
+                  </p>
+                )}
 
-            {error && <p className="error-message">{error}</p>}
-            <button type="submit" onClick={()=>{}}>Submit</button>
-          </form>
-          <div className="switch-option">
-            <div>OR </div>
-            <button onClick={() => setIsLogin(true)} className="switch-link">Login Instead</button>
-          </div>
+                {error && <p className="error-message">{error}</p>}
+                {/* Send OTP button for signup */}
+                <button type="button" onClick={handleSendOtp}>
+                  Send OTP
+                </button>
+                <button type="submit">Sign Up</button>
+              </form>
+              <div className="switch-option">
+                <div>OR</div>
+                <button
+                  onClick={() => {
+                    setIsLogin(true);
+                    resetFields();
+                  }}
+                  className="switch-link"
+                >
+                  Login Instead
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
-      
+      {successMessage && (
+        <div className="success-message">{successMessage}</div>
+      )}
     </div>
-    }
-    {successMessage && <div className="success-message">{successMessage}</div>}
-    </div>
-
   );
 }
 

@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 // Import files
 import connectDB from "./src/db/db.js";
 import userRouter from "./src/routes/user.route.js";
+import chatRouter from "./src/routes/chat.routes.js";
+import seedUsers from "./src/seeders/user.seeder.js";
 
 // Initializations
 const app = express();
@@ -28,7 +30,7 @@ app.use(express.json());
 app.use(cookieParser());
 // Database connection
 connectDB()
-console.log("Database connected successfully");
+console.log("Database going to connect.....");
 
 // Routes
 app.get("/", (req, res) => {
@@ -36,7 +38,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/user", userRouter);
-
+app.use("/chat", chatRouter);
 // Start server
 const port = process.env.PORT || 7000;
 app.listen(port, () => {

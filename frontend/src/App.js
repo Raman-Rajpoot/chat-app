@@ -12,10 +12,10 @@ function App() {
   return (
     <div className="app">
       <div className="app__body">
-        <Login />
-          {/* <Navbar /> 
+        {/* <Login /> */}
+          <Navbar /> 
         <Sidebar />
-        <NormalChatWindow />  */}
+        <NormalChatWindow />  
         {/* <CollabChatWindow /> */}
       </div>
     </div>

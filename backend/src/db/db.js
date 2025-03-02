@@ -1,6 +1,7 @@
 // import packages
 import mongoose from "mongoose";
 import dotenv from 'dotenv'
+import seedUsers from "../seeders/user.seeder.js";
 
 // import files
 
@@ -16,11 +17,12 @@ const connectDB = async ()=>{
        await mongoose.connect(MONGO_URL);
 
     console.log('Database connected successfully');
-
+    
     }
     catch(err){
         console.log('Error connecting to database :- ', err);
     }
+    // seedUsers(5)
 }
 
 export default connectDB;
