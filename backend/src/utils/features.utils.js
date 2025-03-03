@@ -6,4 +6,4 @@ const deleteFileFromCloudinary = (public_id) => {
   console.log("deleting file from cloudinary..", public_id)
 }
 
-export default { emitEvent, deleteFileFromCloudinary };
+export  { emitEvent, deleteFileFromCloudinary };

@@ -1,9 +1,9 @@
 import { Chat } from "../models/chat.model.js";
-import emitEvent from "../utils/features.utils.js";
-import deleteFileFromCloudinary from "../utils/features.utils.js";
-import events from "../constants/events.js";
+import {emitEvent} from "../utils/features.utils.js";
+import {deleteFileFromCloudinary} from "../utils/features.utils.js";
+import  { ALERT, REFETCH_CHATS,NEW_ATTACHMENT, NEW_MESSAGE } from "../constants/events.js";
 import { User } from "../models/user.model.js";
-const { ALERT, REFETCH_CHATS,NEW_ATTACHMENT, NEW_MESSAGE } = events;
+// const { ALERT, REFETCH_CHATS,NEW_ATTACHMENT, NEW_MESSAGE } = events;
 // import upload/ from "../middlewares/upload.middleware.js";
 import { Message } from "../models/message.model.js";
 
@@ -405,6 +405,7 @@ const getMesasages = async (req, res) => {
   }
 }
 
+
 export default{
   createGroupChat,
   getMyChats,
@@ -415,5 +416,6 @@ export default{
   getChats,
   renameGroup,
   deleteChat,
-  getMesasages
+  getMesasages,
+  
  };

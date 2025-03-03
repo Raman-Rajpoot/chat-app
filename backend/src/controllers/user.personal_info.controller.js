@@ -5,6 +5,11 @@ import { OTP } from "../models/otp.model.js";
 import sendOTP from "../utils/optSend.utils.js";
 import Fuse from "fuse.js";
 import { Chat } from "../models/chat.model.js";
+import { FriendRequest } from "../models/request.model.js";
+
+import {NEW_REQUEST, REFETCH_CHATS} from "../constants/events.js";
+import  {emitEvent}  from "../utils/features.utils.js";
+
 const sendOTPRoute = async (req, res) => {
     const { name, email, password } = req.body;
   
@@ -328,6 +333,148 @@ const searchMyChat = async (req, res) => {
   }
 };
 
- 
+ const sendFriendRequest = async (req, res) => {
+  const { userId } = req.body;
+  const user = req.user;
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+  try {
+    const userTo = await User.findById(userId).select("-password -refreshToken"); 
+    if(!userTo) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const requestExists = await FriendRequest.findOne({
+      $or: [
+        { sender: user._id, receiver: userId },
+        { sender: userId, receiver: user._id }
+      ]
+    });
+    if (requestExists) {
+      return res.status(400).json({ message: "Request already sent or user sent you a requst" });
+    }
+   
+    const newRequest = await FriendRequest.create({
+      sender: user._id,
+      receiver: userId,
+    });
+    emitEvent(NEW_REQUEST, userTo._id, user, newRequest);
+     
+    return res.status(200).json({
+      request: newRequest,
+      message: "Request sent successfully",
+    });
 
-export { SignUp, Login, getUser, sendOTPRoute, verifyOTPRoute,logout ,searchUserFuzzy, searchMyChat};
+  } catch (error) {
+    console.error("Error sending request:", error);
+    return res.status(500).json({ message: "Error sending request" });
+  }
+ }
+
+ 
+const accepteFriendRequest = async (req, res) => {
+  const { requestId, accept } = req.body;
+  console.log(requestId);
+  if (!requestId) {
+    return res.status(400).json({ message: "RequestId is required" });
+  }
+
+  try {
+    const request = await FriendRequest.findById(requestId);
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    if (request.receiver.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: "You are not authorized to accept this request" });
+    }
+  if(accept === false){
+    await request.deleteOne();
+    return res.status(200).json({ message: "Request rejected by friend" });
+  }
+    const members = [request.sender._id, request.receiver._id];
+   await Promise.all([
+     Chat.create({
+      members,
+      isGroupChat: false,
+      name: `${request.sender.name}-${req.user.name}`,
+    }),
+    request.deleteOne()
+    ]);
+
+  
+    emitEvent(req, REFETCH_CHATS, [request.sender], { message: `${req.user.name} accepted your friend request` });
+
+    return res.status(200).json({ message: "Request accepted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error accepting request", error });
+  }
+}
+
+const getNotifications = async (req, res) => {
+  try {
+    const requests = await FriendRequest.find({ receiver: req.user._id })
+      .populate("sender", "name email avatar")
+      .lean();
+
+      const notifications = requests.map(({ _id, sender }) => ({
+        _id,
+        sender: {
+          _id: sender._id,
+          name: sender.name,
+          email: sender.email,
+          avatar: sender.avatar?.url || "" 
+        }
+      }));
+    return res.status(200).json({ requests: notifications, success: true });
+  } catch (error) {
+    return res.status(500).json({ message: "Error getting notifications", error });
+  }
+}
+
+
+const getMyFriends = async (req, res) => {
+  try {
+    const {chatId} = req.query.id;
+ 
+    const chat = await Chat.find({members : req.user, isGroupChat: false}).populate("members", "name email avatar").lean();
+  
+
+    const friends = chat.members
+  .filter(member => member._id.toString() !== req.user._id.toString())
+  .map(friend => ({
+    _id: friend._id,
+    name: friend.name,
+    email: friend.email,
+    avatar: friend.avatar?.url || ""
+  }));
+
+  if(chatId){
+    const chat = await Chat.findById(chatId);
+    
+    const availableFriends = friends.filter(friend => !chat.members.includes(friend._id));
+    return res.status(200).json({ friends: availableFriends, success: true });
+  }else{
+    return res.status(200).json({ friends, success: true });
+  }
+
+  } catch (error) {
+    return res.status(500).json({ message: "Error getting notifications", error });
+  }
+}
+
+export 
+  { 
+    SignUp,
+    Login,
+    getUser,
+    sendOTPRoute,
+    verifyOTPRoute,
+    logout,
+    searchUserFuzzy,
+    searchMyChat,
+    sendFriendRequest,
+    accepteFriendRequest,
+    getNotifications, 
+    getMyFriends
+  };

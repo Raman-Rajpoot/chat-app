@@ -9,9 +9,12 @@ import connectDB from "./src/db/db.js";
 import userRouter from "./src/routes/user.route.js";
 import chatRouter from "./src/routes/chat.routes.js";
 import seedUsers from "./src/seeders/user.seeder.js";
-
+import {Server} from "socket.io";
 // Initializations
 const app = express();
+
+
+
 dotenv.config();
 
 
@@ -39,6 +42,9 @@ app.get("/", (req, res) => {
 
 app.use("/user", userRouter);
 app.use("/chat", chatRouter);
+
+
+
 // Start server
 const port = process.env.PORT || 7000;
 app.listen(port, () => {
