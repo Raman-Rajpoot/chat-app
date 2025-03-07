@@ -1,48 +1,118 @@
+/* TopNavbar.css */
+.chatWindow__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #2a2a2a;
+  background-color: #0a0a0a;
+  width: 100%;
+  position: relative;
+}
 
+.chat-person-name {
+  color: #00ff88;
+  font-size: 1.4rem;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+  margin: 0;
+}
+
+.type-of-chat {
+  display: flex;
+  gap: 1rem;
+  border: 1px solid #00ff88;
+  border-radius: 2rem;
+  padding: 0.25rem;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+  background-color: #121212;
+}
+
+.chat-type-btn {
+  padding: 0.7rem 2rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  color: #888;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+}
+
+.chat-type-btn.selected {
+  background-color: #00ff88;
+  color: #0a0a0a;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+}
+
+.glow-effect {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 255, 136, 0.2),
+      transparent
+  );
+  transition: 0.5s;
+}
+
+.chat-type-btn:hover .glow-effect {
+  left: 100%;
+}
+
+/* Search Icon Styling */
+.nav-icon {
+  width: 50px;
+  height: 50px;
+  border: none;
+  background: #1a1a1a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-icon:hover {
+  background: #393b3a44;
+  box-shadow: 0 0 12px rgba(55, 59, 57, 0.3);
+}
+
+.search-icon {
+  width: 24px;
+  height: 24px;
+  fill: #2e694d5e; /* Icon color */
+}
+
+.nav-icon:hover .search-icon {
+  fill: #0a0a0a; /* Icon color on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .chatWindow__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1em;
-    border-bottom: 1px solid #ddd;
-    background-color: #f8f9fa;
-    width: 73vw;
+      padding: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
   }
-  .type-of-chat{
-    display: flex;
-    gap: 1.8rem;
-    border: 1px solid black;
-    text-align: center;
-    border-radius: 2rem;
-    /* padding:1rem; */
-    box-sizing: border-box;
+  
+  .chat-person-name {
+      font-size: 1.2rem;
   }
-  .type-of-chat:hover{
-    cursor: pointer;
+  
+  .chat-type-btn {
+      padding: 0.5rem 1.5rem;
   }
-  .chat-contact-search{
-    display: flex;
-    gap: 1.1rem;
+  
+  .nav-icon {
+      width: 36px;
+      height: 36px;
   }
-  .selected{
-    /* border: 1px solid blue; */
-    border-radius: 2rem;
-    padding:0.7rem 1.5rem;
-    box-sizing: border-box;
-    background-color: #0b81ff;
-    color: #fff;
-    /* transition: background 0.1s; */
-    
-  }
-  .not-selected{
-    padding-top:0.7rem; 
-    padding-bottom: 0.7rem;
-    box-sizing: border-box;
-    /* transition: background 0.2s; */
-  }
-  .Normal{
-    padding-left: 1.3rem;
-  }
-  .Collab{
-    padding-right: 1.3rem;
-  }
+}

@@ -283,7 +283,7 @@ const submitSignUp = async (e) => {
               onChange={(e) => setOtp(e.target.value)}
             />
             <button type="button" onClick={handleVerifyOtp}>
-              Verify OTP
+               Submit
             </button>
           </form>
           {error && <p className="error-message">{error}</p>}
@@ -341,32 +341,29 @@ const submitSignUp = async (e) => {
             <div className="signup-form">
               <h2 className="form-title">Sign Up</h2>
               <form onSubmit={submitSignUp}>
-                <div className="avatar-section">
-                  <div className="avatar">
-                    <img
-                      src={avatar || "https://via.placeholder.com/100"}
-                      alt="Avatar"
-                      className="avatar-img"
-                      onClick={() =>
-                        document.getElementById("avatar-upload").click()
-                      }
-                    />
-                    <p
-                      className="upload-icon"
-                      onClick={() =>
-                        document.getElementById("avatar-upload").click()
-                      }
-                    >
-                      +
-                    </p>
-                    <input
-                      type="file"
-                      id="avatar-upload"
-                      style={{ display: "none" }}
-                      onChange={handleAvatarUpload}
-                    />
-                  </div>
-                </div>
+              <div className="avatar-section">
+  <div className="avatar-container">
+    <div className="avatar">
+      <img
+        src={avatar || "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNCIvPjxwYXRoIGQ9Ik0yMCAyMHYtMmE0IDQgMCAwIDAtNC00SDhhNCA0IDAgMCAwLTQgNHYyIi8+PC9zdmc+"}
+        alt="Avatar"
+        className="avatar-img"
+        onClick={() => document.getElementById("avatar-upload").click()}
+      />
+      <div className="upload-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 6V18M18 12L6 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      </div>
+    </div>
+    <input
+      type="file"
+      id="avatar-upload"
+      style={{ display: "none" }}
+      onChange={handleAvatarUpload}
+    />
+  </div>
+</div>
                 <label htmlFor="signup-name">Name:</label>
                 <input
                   type="text"
@@ -430,9 +427,9 @@ const submitSignUp = async (e) => {
                 {error && <p className="error-message">{error}</p>}
                 {/* Send OTP button for signup */}
                 <button type="button" onClick={handleSendOtp}>
-                  Send OTP
+                  NEXT
                 </button>
-                <button type="submit">Sign Up</button>
+                
               </form>
               <div className="switch-option">
                 <div>OR</div>
