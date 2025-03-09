@@ -1,6 +1,7 @@
 /* NormalChatWindow.css */
 .NormalchatWindow {
-  flex: 0.9;
+  flex: 1;
+  /* min-width: 65vw; */
   display: flex;
   flex-direction: column;
   height: 100vh;

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import './TopNavbar.css';
 import searchIcon from "../images/search.png";
+import SearchNewUser from './SearchNewUser';
 function TopNavbar() {
     const [chatType, setChatType] = useState("Normal");
-
+    const [showSearch, setShowSearch] = useState(false);
     return (
         <div className="chatWindow__header">
             <h3 className='chat-person-name'>Chat with User 1</h3>
@@ -27,8 +28,9 @@ function TopNavbar() {
 
             {/* Only Search Icon */}
             <button className="nav-icon">
-            <img src={searchIcon} alt="search" />
+            <img src={searchIcon} alt="search" onClick={() => setShowSearch(true)} />
             </button>
+            {showSearch && <SearchNewUser isOpen={showSearch} onClose={() => setShowSearch(false)} />}
         </div>
     );
 }

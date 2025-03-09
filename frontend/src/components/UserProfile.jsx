@@ -1,35 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit } from '@fortawesome/free-regular-svg-icons';
 import { faUser, faCog, faRobot, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './UserProfile.css';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { updateData } from '../redux/features/user.feature';
+import userAPI from '../api/user.api';
 const UserProfile = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [userData, setUserData] = useState({
-    fullName: 'John Doe',
-    email: 'john@example.com',
-    avatar: '',
-    isAdmin: true,
-  });
+
+  const userData = useSelector((state) => state.userData);
+  const dispatch = useDispatch();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: value }));
+     dispatch(updateData((prev) => ({ ...prev, [name]: value })));
   };
 
   const handleAdminRedirect = () => {
     console.log('Redirecting to admin panel...');
   };
 
+ 
+
   return (
     <>
       <div className="sidebar-profile">
         <div className="profile-section">
           <div className="avatar-container">
-            {userData.avatar ? (
-              <img src={userData.avatar} className="profile-image" alt="Profile" />
+            {userData?.avatar?.url ? (
+              <img src={userData?.avatar?.url} className="profile-image" alt="Profile" />
             ) : (
               <div className="user-icon">
                 <FontAwesomeIcon icon={faUser} />
@@ -44,18 +45,22 @@ const UserProfile = () => {
             </div>
           </div>
 
-          <div className="user-info">
+          <div className="user-info-profile">
             <div className="info-item" >
-              <label>Full Name</label>
-              <h3>{userData.fullName}</h3>
+              <label>name</label>
+              <h3>{userData?.name}</h3>
             </div>
             <div className="info-item" >
               <label>Email</label>
-              <p>{userData.email}</p>
+              <p>{userData?.email}</p>
+            </div>
+            <div className="info-item" >
+              <label>Bio</label>
+              <p>{userData?.bio}</p>
             </div>
           </div>
 
-          {userData.isAdmin && (
+          { (
             <button 
               className="admin-btn" 
               onClick={handleAdminRedirect}
@@ -81,14 +86,14 @@ const UserProfile = () => {
               <input
                 type="text"
                 name="fullName"
-                value={userData.fullName}
+                value={userData?.fullName}
                 onChange={handleInputChange}
                 placeholder="Full Name"
               />
               <input
                 type="email"
                 name="email"
-                value={userData.email}
+                value={userData?.email}
                 onChange={handleInputChange}
                 placeholder="Email"
               />
@@ -100,7 +105,7 @@ const UserProfile = () => {
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
-                      setUserData((prev) => ({ ...prev, avatar: URL.createObjectURL(file) }));
+                      dispatch(updateData(((prev) => ({ ...prev, avatar: URL.createObjectURL(file) }))));
                     }
                   }}
                 />

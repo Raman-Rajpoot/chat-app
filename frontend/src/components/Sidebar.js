@@ -13,7 +13,7 @@ const getInitials = (name) => {
 function Sidebar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeUser, setActiveUser] = useState(null); // Track active user
-  const users = ['Alex Smith', 'Emma Johnson', 'Michael Brown', 'Sophia Davis', 'William Wilson', 'Olivia Miller', 'James Taylor', 'Charlotte Anderson', 'Benjamin Thomas', 'Amelia Moore'];
+  const users = ['Alex Smithfs grdssbtrtstszebrtst', 'Emma Johnson', 'Michael Brown', 'Sophia Davis', 'William Wilson', 'Olivia Miller', 'James Taylor', 'Charlotte Anderson', 'Benjamin Thomas', 'Amelia Moore'];
 
   const filteredUsers = users.filter(user =>
     user.toLowerCase().includes(searchQuery.toLowerCase())
@@ -64,7 +64,7 @@ function Sidebar() {
               </div>
               <div className="user-info">
                 <h3 className="user-name">{user}</h3>
-                <p className="last-message">Last message preview...</p>
+                
               </div>
             </div>
           ))

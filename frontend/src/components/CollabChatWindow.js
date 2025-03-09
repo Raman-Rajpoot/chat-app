@@ -6,12 +6,7 @@ function CollabChatWindow() {
 
    
   return (
-    <div className='CollabChatWindow'>
-       {!fullWindow ?  <TopNavbar />:"" }
-        <div onClick={()=>{
-            setFullWindow(!fullWindow);
-        }} className={fullWindow? "fullWindow widthBar": "window widthBar"}>{fullWindow ? 'Full': 'Normal' }</div>
-    </div>
+   <div></div>
   )
 }
 

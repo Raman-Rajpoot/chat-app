@@ -15,6 +15,12 @@ import { NEW_MESSAGE, NEW_MESSAGE_AlERT } from "./src/constants/events.js";
 import { getSockets } from "./src/utils/socket.utils.js";
 import { Message } from "./src/models/message.model.js";
 ;
+
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import mongoose from "mongoose";
+
+
 // Initializations
 const app = express();
 const server = createServer(app);
@@ -41,15 +47,43 @@ app.use(
 
 app.use(express.json()); 
 app.use(cookieParser());
+
+// app.use(
+//     session({
+//       secret: process.env.SESSION_SECRET,
+//       resave: false,
+//       saveUninitialized: false,
+//       cookie: {
+//         maxAge: 3600000, // 1 hour
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === 'production', // Use secure cookies only in production (HTTPS)
+//         sameSite: 'lax', // or 'none' (if using cross-site and secure: true)
+//       },
+//       store: MongoStore.create({
+//         mongoUrl: process.env.MONGO_URL,
+//         collectionName: "sessions",
+//       }),
+//     })
+//   );
+  
+  
+
 // Database connection
 connectDB()
 console.log("Database going to connect.....");
+
+
 
 // Routes
 app.get("/", (req, res) => {
     res.send("Hello from Express");
 });
-
+// app.get('/session-test', (req, res) => {
+//     console.log(req)
+//     res.json({ session: req.session });
+    
+//   });
+  
 app.use("/user", userRouter);
 app.use("/chat", chatRouter);
 

@@ -1,29 +1,33 @@
-import React, { lazy } from 'react';
-import './App.css';
-import Sidebar from './components/Sidebar.js'
+import React, { useEffect } from 'react';
+
+import { Route, Routes, BrowserRouter as Router ,useNavigate} from 'react-router-dom';
+
+
 import NormalChatWindow from './components/NormalChatWindow.js';
-import Navbar from './components/Navbar.js';
+
 import CollabChatWindow from './components/CollabChatWindow.js';
 import Login from './components/Login.js';
-import TopNavbar from './components/TopNavbar.js';
-import UserProfile from './components/UserProfile.jsx';
- 
+import Layout from './Layout.jsx';
+import { useSelector, useDispatch } from 'react-redux';
 
+import userAPI from '../src/api/user.api.js'
+import { updateData } from '../src/redux/features/user.feature.js';
+const App = () => {
+ const dispatch = useDispatch();
+ const userData = useSelector((state) => state.userData);
 
-function App() {
   return (
-   
-    // <div className="app">
-    //    <div className="app__body"> 
-      
-    //      <Navbar />  
-    //      <Sidebar /> 
-    //      <NormalChatWindow />   
-    //    <UserProfile />
-    //  </div> 
-      <Login/>
-    // </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<NormalChatWindow />} />
+          <Route path="collab" element={<CollabChatWindow />} />
+        
+        </Route>
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;

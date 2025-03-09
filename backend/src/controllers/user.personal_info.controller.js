@@ -9,6 +9,23 @@ import { FriendRequest } from "../models/request.model.js";
 
 import {NEW_REQUEST, REFETCH_CHATS} from "../constants/events.js";
 import  {emitEvent}  from "../utils/features.utils.js";
+
+
+const generateTokens = async (_id) => {
+  if (!_id) {
+    return null;
+  }
+  const user = await User.findById(_id);
+  if (!user) {
+    return null;
+  }
+
+  const accessToken = await user.generateAccessToken();
+  const refreshToken = await user.generateRefreshToken();
+
+  return { accessToken, refreshToken };
+};
+
 const sendOTPRoute = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -60,7 +77,7 @@ const verifyOTPRoute = async (req, res) => {
           // Mark OTP as verified (optional)
           otpRecord.verified = true;
           await otpRecord.save();
-          
+
           return res.status(200).json({ success: true, message: "OTP verified successfully" });
       } else {
           return res.status(400).json({ success: false, message: "Invalid OTP" });
@@ -127,20 +144,29 @@ const Login = async (req, res) => {
 
   try {
       const user = await User.findOne({ email });
+      console.log("User: ",user)
       if (!user) {
           return res.status(404).json({
               message: "User Not Found",
           });
       }
-
+  
       const passwordCheck = await user.comparePassword(password);
+      console.log("password check : ",passwordCheck)
       if (!passwordCheck) {
           return res.status(400).json({
               message: "Password is incorrect",
           });
       }
 
-      const { accessToken, refreshToken } = await generateTokens(user?._id);
+      const tokens = await generateTokens(user._id);
+      console.log(tokens);
+      if(!tokens){
+        return res.status(400).json({
+          message: "Error during generating Tokens",
+      });
+      }
+      const { accessToken, refreshToken } = tokens;
       if (!accessToken || !refreshToken) {
           return res.status(400).json({
               message: "Error during generating Tokens",
@@ -149,16 +175,9 @@ const Login = async (req, res) => {
 
       const loginUser = await User.findById(user._id).select("-password -refreshToken");
 
-      res.cookie("accessToken", accessToken, {
-          maxAge: 3600000, // 1 hour
-          httpOnly: true,
-          secure: false,
-      });
-      res.cookie("refreshToken", refreshToken, {
-          maxAge: 3600000,
-          httpOnly: true,
-      });
+       console.log("Login User: ",loginUser)
 
+      console.log(accessToken)
       return res.status(200).json({
           message: "Login Success",
           data: {
@@ -199,27 +218,35 @@ const getUser = async (req, res) => {
 
 
 const searchUserFuzzy = async (req, res) => {
-  const { search } = req.body;
+  const { search } = req.query;
+  console.log(search)
   if (!search) {
     return res.status(400).json({ message: "Search field is empty" });
   }
   
   try {
     
-    const users = await User.find({}).select("-password -refreshToken");
-    
-    // Configure Fuse.js options
-    const fuseOptions = {
-      keys: ["name", "email"],
-      threshold: 0.3, // Lower threshold means stricter matching; adjust as needed
-    };
-    const fuse = new Fuse(users, fuseOptions);
-    
-    // Perform fuzzy search on the users array
-    const results = fuse.search(search).map(result => result.item);
-    
+    const users = await User.aggregate([
+      {
+        $search: {
+          index: "Users", 
+          text: {
+            query: search,
+            path: ["name", "email"], 
+            fuzzy: {
+              maxEdits: 2, 
+              prefixLength: 1, 
+            },
+          },
+        },
+      },
+      {
+        $project: { password: 0, refreshToken: 0 }, 
+      },
+    ])
+   
     return res.status(200).json({
-      users: results,
+      user:users,
       message: "Users retrieved successfully (fuzzy search)"
     });
   } catch (error) {

@@ -1,0 +1,407 @@
+/* SearchNewUser.css */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .search-modal {
+    width: 35vw;
+    height: 80vh;
+    background: #0a0a0a;
+    border-radius: 16px;
+    border: 1px solid #00ff88;
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
+    padding: 28px;
+    position: relative;
+    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .close-btn:hover {
+    transform: rotate(90deg) scale(1.1);
+  }
+  
+  .search-header {
+    margin-bottom: 28px;
+  }
+  
+  .search-header h2 {
+    color: #00ff88;
+    margin: 0 0 24px 0;
+    font-size: 1.8rem;
+    text-align: center;
+    text-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+  }
+  
+  .search-input-container {
+    position: relative;
+  }
+  
+  .search-input-container input {
+    width: 100%;
+    padding: 14px 48px;
+    background: #121212;
+    border: 2px solid #2a2a2a;
+    border-radius: 30px;
+    color: #fff;
+    font-size: 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .search-input-container input:focus {
+    border-color: #00ff88;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+  }
+  
+  .results-container {
+    height: calc(100% - 130px);
+    overflow-y: auto;
+    
+  }
+  
+  /* Custom Scrollbar */
+  .results-container::-webkit-scrollbar {
+    width: 1px;
+  }
+  
+  .results-container::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+  
+  .results-container::-webkit-scrollbar-thumb {
+    background: #00ff88;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  .results-container::-webkit-scrollbar-thumb:hover {
+    background: #00cc6a;
+    transform: scaleX(1.2);
+  }
+  
+  .user-card {
+    display: flex;
+    
+    justify-content: flex-start;
+    align-items: center;
+    padding: 18px 5px;
+    margin-bottom: 14px;
+    background: #121212;
+    border-radius: 12px;
+    animation: slideIn 0.4s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+  }
+  
+  .user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+  }
+  
+  .user-info-search {
+    flex: 0.95;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    padding-left: 10%;
+    padding-top: 5px;
+    gap: 1.5rem;
+   
+  }
+  
+  .result-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 2px solid #00ff88;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00ff88;
+    font-size: 24px;
+    font-weight: 600;
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+  }
+  
+  .user-details h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  .user-details p {
+    margin: 6px 0 0 0;
+    color: #666;
+    font-size: 13px;
+    font-weight: 400;
+  }
+  
+ /* Add Friend Button Styles */
+.add-friend-btn {
+    position: relative;
+    display: flex;
+    
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-color: #ff4444;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white;
+   
+  }
+  
+  .add-friend-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .add-friend-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .add-friend-btn.added {
+    background-color: #00ff88;
+  }
+  
+  /* Icon Transition Styles */
+  .add-friend-btn .plus-icon,
+  .add-friend-btn .minus-icon {
+    position: absolute;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+  }
+  
+  .add-friend-btn .plus-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  
+  .add-friend-btn .minus-icon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+    /* background-color: #ff4444; */
+  }
+  
+  .add-friend-btn.added .plus-icon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+  }
+  
+  .add-friend-btn.added .minus-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  
+  /* Tooltip Styles */
+  .add-friend-btn .tooltip {
+    position: absolute;
+    bottom: 60%;
+    left: -100%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: sans-serif;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease 0.1s;
+    margin-bottom: 8px;
+    z-index: 10000;
+  }
+  
+  .add-friend-btn .tooltip::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 4px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+  }
+  
+  .add-friend-btn:hover .tooltip {
+    opacity: 1;
+  }
+  
+  
+  .loading-spinner {
+    border: 4px solid #00ff88;
+    border-top-color: transparent;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 60px auto;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 60px 0;
+    color: #666;
+  }
+  
+  .empty-state svg {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+    opacity: 0.6;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes scaleIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  @keyframes tooltipFade {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+ /* Tablet and Larger Screens */
+ @media (max-width: 1440px) {
+    .search-modal {
+      /* padding: 32px; */
+      width: 47vw;
+     
+    }
+}
+
+@media (max-width: 1100px) {
+    .search-modal {
+      /* padding: 32px; */
+      width: 55vw;
+     
+    }
+}
+
+
+@media (max-width: 1000px) {
+    .search-modal {
+      /* padding: 32px; */
+      width: 75vw;
+      height: 90vh;
+     
+    }
+  
+  
+    .user-details h3 {
+      font-size: 16.5px;
+    }
+  
+    .user-details p {
+      font-size: 13.5px;
+    }
+  
+    .add-friend-btn {
+      width: 50px;
+      height: 50px;
+      margin-top: 0;
+    }
+  }
+  
+  /* Small Mobile Devices */
+  @media (max-width: 750px) {
+    .search-modal {
+      width: 85vw;
+      height: 95vh;
+      padding: 4px;
+      /* height: 80vh; */
+    }
+  
+    .search-header h2 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+  
+    .search-input-container input {
+      padding: 12px 40px;
+      font-size: 14px;
+    }
+  
+    .avatar {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+    }
+  
+    .user-details h3 {
+      font-size: 14px;
+    }
+  
+    .user-details p {
+      font-size: 11px;
+    }
+  }
+  
+ 
+  @media (max-width: 650px) {
+    .search-modal {
+      width: 98vw;
+      height: 98vh;
+      padding: 0px;
+      
+    }
+}
+@media (max-width: 500px) {
+    .search-modal {
+      width: 100vw;
+      height: 100vh;
+      padding: 0px;
+      
+    }
+}
+ 

@@ -15,7 +15,7 @@ userRouter.get("/getuser", Authorization, getUser);
 userRouter.post("/send-otp", sendOTPRoute);        
 userRouter.post("/verify-otp", verifyOTPRoute);    
 userRouter.post("/logout", logout);
-userRouter.get("/search/alluser", Authorization, searchUserFuzzy);
+userRouter.get("/search/alluser",Authorization, searchUserFuzzy);
 userRouter.get("/search/mychat", Authorization, searchMyChat);
 userRouter.post("/send-friend-request", Authorization, sendFriendRequest);
 userRouter.post("/accept-friend-request", Authorization, accepteFriendRequest);
