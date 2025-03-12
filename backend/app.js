@@ -78,11 +78,7 @@ console.log("Database going to connect.....");
 app.get("/", (req, res) => {
     res.send("Hello from Express");
 });
-// app.get('/session-test', (req, res) => {
-//     console.log(req)
-//     res.json({ session: req.session });
-    
-//   });
+
   
 app.use("/user", userRouter);
 app.use("/chat", chatRouter);

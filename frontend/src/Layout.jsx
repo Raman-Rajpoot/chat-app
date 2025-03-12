@@ -18,10 +18,11 @@ const navigate = useNavigate()
 const getUser = async() => {
   try {
     const response = await userAPI.get('/getuser',{ withCredentials: true }); 
-    console.log(response);
+   
 
-    if (response) {
-      dispatch(updateData(response?.data?.user)); 
+    if (response.data) {
+      dispatch(updateData(response?.data?.user));
+      console.log("user : ", response.data.user) 
     } else {
       console.error(response?.message);
       navigate('/login')

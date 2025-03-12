@@ -199,7 +199,13 @@
   .add-friend-btn.added {
     background-color: #00ff88;
   }
-  
+  .save-changes{
+    position: absolute;
+    width: 80%;
+    left: 12%;
+    bottom: 1%;
+
+  }
   /* Icon Transition Styles */
   .add-friend-btn .plus-icon,
   .add-friend-btn .minus-icon {
@@ -228,7 +234,14 @@
     opacity: 1;
     transform: rotate(0deg) scale(1);
   }
-  
+  .add-friend-btn.pending .plus-icon{
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5)
+  }
+  .add-friend-btn.pending .minus-icon{
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5)
+  }
   /* Tooltip Styles */
   .add-friend-btn .tooltip {
     position: absolute;
@@ -405,3 +418,18 @@
     }
 }
  
+
+.add-friend-btn.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.add-friend-btn.loading .plus-icon,
+.add-friend-btn.loading .minus-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

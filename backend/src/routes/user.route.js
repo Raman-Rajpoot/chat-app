@@ -3,6 +3,7 @@ import { Login, getUser, sendOTPRoute, verifyOTPRoute, SignUp ,logout, searchUse
 import { Authorization } from "../middlewares/auth.middleware.js";
 // import multer from "multer";
 import upload from "../middlewares/multer.middleware.js";
+import {getMyRequests, getsendRequests} from "../controllers/user.other_info.controller.js";
 
 const userRouter = express.Router();
 
@@ -21,4 +22,5 @@ userRouter.post("/send-friend-request", Authorization, sendFriendRequest);
 userRouter.post("/accept-friend-request", Authorization, accepteFriendRequest);
 userRouter.get("/get-notifications", Authorization, getNotifications);
 userRouter.get("/get-my-friends", Authorization, getMyFriends);
+userRouter.get("/get-requests", Authorization, getsendRequests)
 export default userRouter;

@@ -316,7 +316,9 @@ const searchMyChat = async (req, res) => {
 };
 
  const sendFriendRequest = async (req, res) => {
+  console.log("sending friend")
   const { userId } = req.body;
+  console.log(userId)
   const user = req.user;
   if (!userId) {
     return res.status(400).json({ message: "User ID is required" });
@@ -417,20 +419,19 @@ const getNotifications = async (req, res) => {
 
 const getMyFriends = async (req, res) => {
   try {
-    const {chatId} = req.query.id;
- 
-    const chat = await Chat.find({members : req.user, isGroupChat: false}).populate("members", "name email avatar").lean();
+    const {chatId} = req?.query;
+    console.log(chatId, req.user)
+    const chat = await Chat.find({members : req.user?._id, isGroupChat: false}).populate("members", "name email avatar").lean();
+   console.log("chat : ",chat)
   
-
-    const friends = chat.members
-  .filter(member => member._id.toString() !== req.user._id.toString())
+    const friends = chat?.members?.filter(member => member?._id.toString() !== req.user?._id.toString())
   .map(friend => ({
-    _id: friend._id,
-    name: friend.name,
-    email: friend.email,
-    avatar: friend.avatar?.url || ""
+    _id: friend?._id,
+    name: friend?.name,
+    email: friend?.email,
+    avatar: friend?.avatar?.url || ""
   }));
-
+console.log("friends : ",friends)
   if(chatId){
     const chat = await Chat.findById(chatId);
     

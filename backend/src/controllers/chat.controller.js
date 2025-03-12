@@ -38,7 +38,7 @@ const getMyChats = async (req, res) => {
   try {
     const user = req.user;
     const chats = await Chat.find({ members: user._id }).populate("members", "name avatar");
-
+   console.log(chats)
     const transformedChats = chats.map(({ _id, chatName, isGroupChat, creator, members }) => {
       return {
         _id,

@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Sidebar.css';
+import { useDispatch, useSelector } from "react-redux";
+import { updateFriendData } from '../redux/features/friend.feature.js';
+import chatAPI from '../api/chat.api.js';
 
 // Function to generate user initials
 const getInitials = (name) => {
@@ -15,10 +18,29 @@ function Sidebar() {
   const [activeUser, setActiveUser] = useState(null); // Track active user
   const users = ['Alex Smithfs grdssbtrtstszebrtst', 'Emma Johnson', 'Michael Brown', 'Sophia Davis', 'William Wilson', 'Olivia Miller', 'James Taylor', 'Charlotte Anderson', 'Benjamin Thomas', 'Amelia Moore'];
 
+  const dispatch = useDispatch();
+    const friendData = useSelector((state) => state.friendData);
+
   const filteredUsers = users.filter(user =>
     user.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  const getChat = async ()=>{
+    try{
+        const response = await chatAPI('/get-mychat',{ withCredentials: true })
+        console.log(response)
+        if(response.data){
+            dispatch(updateFriendData(response.data))
+        }
+        else{
+          console.error(response.message)
+        }
+    }catch(err){
+      console.error(err)
+    }
+ }
+useEffect(()=>{
+  getChat()
+}, [dispatch])
   return (
     <div className="sidebar">
       <div className="sidebar__header">
