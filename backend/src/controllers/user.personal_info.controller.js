@@ -381,7 +381,7 @@ const accepteFriendRequest = async (req, res) => {
      Chat.create({
       members,
       isGroupChat: false,
-      name: `${request.sender.name}-${req.user.name}`,
+      chatName: `${request.sender.name}-${req.user.name}`,
     }),
     request.deleteOne()
     ]);

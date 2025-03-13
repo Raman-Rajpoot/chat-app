@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateFriendData } from '../redux/features/friend.feature.js';
 import chatAPI from '../api/chat.api.js';
 
-// Function to generate user initials
+// Function to generate user initials from a name string
 const getInitials = (name) => {
   const names = name.split(' ');
   return names
@@ -16,31 +16,39 @@ const getInitials = (name) => {
 function Sidebar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeUser, setActiveUser] = useState(null); // Track active user
-  const users = ['Alex Smithfs grdssbtrtstszebrtst', 'Emma Johnson', 'Michael Brown', 'Sophia Davis', 'William Wilson', 'Olivia Miller', 'James Taylor', 'Charlotte Anderson', 'Benjamin Thomas', 'Amelia Moore'];
-
+  
   const dispatch = useDispatch();
-    const friendData = useSelector((state) => state.friendData);
-
-  const filteredUsers = users.filter(user =>
-    user.toLowerCase().includes(searchQuery.toLowerCase())
+  const friendData = useSelector((state) => state.friendData);
+  
+  // Use friendData (an array of chat objects) as the source of users
+  // and filter based on chatName
+  const filteredUsers = friendData.filter(user =>
+    user.chatName.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const getChat = async ()=>{
-    try{
-        const response = await chatAPI('/get-mychat',{ withCredentials: true })
-        console.log(response)
-        if(response.data){
-            dispatch(updateFriendData(response.data))
-        }
-        else{
-          console.error(response.message)
-        }
-    }catch(err){
-      console.error(err)
+
+  const getChat = async () => {
+    try {
+      const response = await chatAPI.get('/get-mychat', { withCredentials: true });
+      console.log("users : ", response.data.chats);
+      if(response?.data) {
+        dispatch(updateFriendData(response.data.chats));
+      } else {
+        console.error(response?.message);
+      }
+      console.log(friendData);
+    } catch(err) {
+      console.error(err);
     }
- }
-useEffect(()=>{
-  getChat()
-}, [dispatch])
+  };
+
+  useEffect(() => {
+    getChat();
+  }, [dispatch]);
+
+  useEffect(() => {
+    console.log("friendData updated: ", friendData);
+  }, [friendData]);
+
   return (
     <div className="sidebar">
       <div className="sidebar__header">
@@ -63,15 +71,15 @@ useEffect(()=>{
         {filteredUsers.length === 0 ? (
           <div className="no-results">No matches found</div>
         ) : (
-          filteredUsers.map((user, index) => (
+          filteredUsers.map((user) => (
             <div 
-              key={index} 
-              className={`chat-item ${activeUser === user ? 'active' : ''}`}
-              onClick={() => setActiveUser(user)} // Set active user on click
+              key={user._id} 
+              className={`chat-item ${activeUser === user._id ? 'active' : ''}`}
+              onClick={() => setActiveUser(user._id)} // Set active user on click
             >
               <div className="avatar-container">
                 {/* Conditional avatar rendering */}
-                {false ? ( // Change condition to check for avatar existence
+                {false ? ( // Change condition to check for an existing avatar if available
                   <img
                     src="/images/user-icon.webp"
                     alt="User Avatar"
@@ -79,14 +87,13 @@ useEffect(()=>{
                   />
                 ) : (
                   <div className="avatar-placeholder">
-                    {getInitials(user)}
+                    {getInitials(user.chatName)}
                   </div>
                 )}
                 <div className="online-status"></div>
               </div>
               <div className="user-info">
-                <h3 className="user-name">{user}</h3>
-                
+                <h3 className="user-name">{user.chatName}</h3>
               </div>
             </div>
           ))

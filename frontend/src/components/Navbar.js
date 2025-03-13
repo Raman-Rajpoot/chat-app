@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import './Navbar.css';
 import Notifications from './Notification';
+import CreateGroup from './CreateGroup';
 
 function Navbar() {
   const [activeItem, setActiveItem] = useState('chat');
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [showGroupPopup, setShowGroupPopup] = useState(false);
+
 
   const navItems = [
     { id: 'chat', icon: 'M12 2.042c-6.627 0-12 4.064-12 9.074 0 2.569 1.24 4.888 3.23 6.479-.178.49-.695 1.773-.742 1.989-.056.26.023.416.168.516.135.095.38.163.627.163.299 0 .582-.094.846-.273 1.115-.781 1.729-1.403 2.346-1.73.838.216 1.733.326 2.67.326 6.627 0 12-4.064 12-9.074s-5.373-9.074-12-9.074z', tooltip: 'Chats' },
@@ -18,7 +21,9 @@ function Navbar() {
     setIsNotificationsOpen(true); 
   };
 
-
+  const handleGroupClick = ()=>{
+    setShowGroupPopup(true)
+}
   return (
     <div className='navbar'>
       {navItems.map((item) => (
@@ -30,6 +35,9 @@ function Navbar() {
             if(item.id === 'notification'){
               handleNotificationClick();
             }
+            else if(item.id === 'group'){
+              handleGroupClick()
+            }
           }}
           title={item.tooltip}
         >
@@ -39,6 +47,7 @@ function Navbar() {
         </div>
       ))}
        <Notifications isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
+       <CreateGroup isOpen={showGroupPopup} onClose={() => setShowGroupPopup(false)} />
     </div>
   )
 }

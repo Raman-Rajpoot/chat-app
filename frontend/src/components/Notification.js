@@ -29,8 +29,8 @@ function Notification({ isOpen, onClose }) {
   const handleFriendRequest = async (requestId, action) => {
     try {
       await userAPI.post(
-        `/friend-request/${action}`,
-        { requestId },
+        `/accept-friend-request`,
+        { requestId , action},
         { withCredentials: true }
       );
       // Remove the handled notification

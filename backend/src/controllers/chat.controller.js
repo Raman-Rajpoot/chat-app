@@ -33,30 +33,38 @@ const createGroupChat = async (req, res) => {
   }
 };
 
-
 const getMyChats = async (req, res) => {
   try {
+    console.log("started chat...");
     const user = req.user;
-    const chats = await Chat.find({ members: user._id }).populate("members", "name avatar");
-   console.log(chats)
-    const transformedChats = chats.map(({ _id, chatName, isGroupChat, creator, members }) => {
+    console.log(user);
+
+    // Populate the members field to include avatar and name
+    const chats = await Chat.find({ members: user._id })
+      
+
+    console.log(chats);
+
+    const transformedChats = chats.map(({ _id, isGroupChat, chatName, creator, members }) => {
+      console.log(_id, chatName, isGroupChat, creator, members);
       return {
         _id,
         chatName,
         isGroupChat,
         creator,
         avatar: !isGroupChat
-          ? [members.find(member => member._id.toString() !== user._id.toString()).avatar.url]
-          : members.slice(0, 3).map(member => member.avatar.url),
+          ? [members.find(member => member?._id?.toString() !== user._id?.toString())?.avatar?.url]
+          : members.slice(0, 3).map(member => member?.avatar?.url),
         members: members.reduce((acc, member) => {
-          if (member._id.toString() !== user._id.toString()) {
-            acc.push({ _id: member._id, name: member.name });
+          if (member?._id?.toString() !== user?._id?.toString()) {
+            acc.push({ _id: member?._id, name: member?.name });
           }
           return acc;
         }, []),
       };
     });
 
+    console.log("transform chat : ", transformedChats);
     return res.status(200).json({ chats: transformedChats, message: "Chats fetched successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Error fetching chats", error });

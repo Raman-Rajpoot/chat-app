@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-
-export const LoginStore = configureStore({
+import FriendReducer from '../features/friend.feature.js';
+export const friendStore = configureStore({
   reducer: {
-    userData: FriendReducer,
+    friendData: FriendReducer,
   },
 });
 
-export default LoginStore;
+export default friendStore;
