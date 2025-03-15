@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,  } from 'react';
+import { useNavigate } from "react-router";
 import './Sidebar.css';
 import { useDispatch, useSelector } from "react-redux";
 import { updateFriendData } from '../redux/features/friend.feature.js';
 import chatAPI from '../api/chat.api.js';
 
+
+
+
 // Function to generate user initials from a name string
+
 const getInitials = (name) => {
   const names = name.split(' ');
   return names
@@ -12,11 +17,10 @@ const getInitials = (name) => {
     .join('')
     .toUpperCase();
 };
-
 function Sidebar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeUser, setActiveUser] = useState(null); // Track active user
-  
+  const navigate =useNavigate()
   const dispatch = useDispatch();
   const friendData = useSelector((state) => state.friendData);
   
@@ -48,6 +52,11 @@ function Sidebar() {
   useEffect(() => {
     console.log("friendData updated: ", friendData);
   }, [friendData]);
+ 
+
+  const updateChatRoute = async (chatId)=>{
+      navigate(`chat/${chatId}`)  
+  }
 
   return (
     <div className="sidebar">
@@ -75,7 +84,9 @@ function Sidebar() {
             <div 
               key={user._id} 
               className={`chat-item ${activeUser === user._id ? 'active' : ''}`}
-              onClick={() => setActiveUser(user._id)} // Set active user on click
+              onClick={() => {setActiveUser(user._id);
+                updateChatRoute(user._id);
+              }} 
             >
               <div className="avatar-container">
                 {/* Conditional avatar rendering */}

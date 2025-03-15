@@ -1,5 +1,25 @@
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #f0f2f5;
+  background-color: #1a211b;
+}
+/* Scrollbar Styling */
+.scroller::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scroller::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+
+.scroller::-webkit-scrollbar-thumb {
+  background: #00ff88;
+  border-radius: 3px;
+  border: 1px solid #0a0a0a;
+}
+
+.scroller::-webkit-scrollbar-thumb:hover {
+  background: #00cc6a;
 }

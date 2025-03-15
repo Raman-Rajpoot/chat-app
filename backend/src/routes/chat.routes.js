@@ -1,6 +1,6 @@
 import express from "express";
 import chatController from "../controllers/chat.controller.js";
-const { createGroupChat, getMyChats ,addMembersToGroup, removeMember,leaveGroup,sendAttachment,getChats, renameGroup,deleteChat, getMesasages} = chatController;
+const { createGroupChat, getMyChats ,addMembersToGroup, removeMember,leaveGroup,sendAttachment,getChats, renameGroup,deleteChat, getMesasages,getChatDetails} = chatController;
 import { Authorization } from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/multer.middleware.js";
 
@@ -18,4 +18,5 @@ chatRouter.get("/get-chats", Authorization, getChats);
 chatRouter.put("/rename-group/:id", Authorization, renameGroup);
 chatRouter.delete("/delete-chat/:id", Authorization, deleteChat);
 chatRouter.get("/get-messages/:id", Authorization, getMesasages);
+chatRouter.get("/get-chatInfo/:chatId",Authorization, getChatDetails)
 export default chatRouter;

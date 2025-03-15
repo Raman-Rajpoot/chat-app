@@ -412,7 +412,42 @@ const getMesasages = async (req, res) => {
     return res.status(500).json({ message: "Error fetching messages", error });
   }
 }
+const getChatDetails = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    console.log(chatId)
+    const userId = req.user?._id; // Ensure `req.user` exists
 
+    if (!userId) {
+      return res.status(403).json({ 
+        message: "User is not authorized to get info", 
+        success: false 
+      });
+    }
+
+    const chatDetail = await Chat.findById(chatId).populate('members', '_id name email avatar');
+
+    if (!chatDetail) {
+      return res.status(404).json({
+        message: "Chat not found",
+        success: false
+      });
+    }
+
+    return res.status(200).json({ 
+      message: "Chat details fetched successfully",
+      success: true,
+      data: chatDetail
+    });
+
+  } catch (err) {
+    return res.status(500).json({ 
+      message: "Error during fetching info", 
+      success: false, 
+      error: err.message 
+    });
+  }
+};
 
 export default{
   createGroupChat,
@@ -425,5 +460,5 @@ export default{
   renameGroup,
   deleteChat,
   getMesasages,
-  
+  getChatDetails
  };

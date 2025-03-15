@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
 import './TopNavbar.css';
 import searchIcon from "../images/search.png";
+import {useNavigate,  useParams} from "react-router-dom"
 import SearchNewUser from './SearchNewUser';
+
+
 function TopNavbar() {
     const [chatType, setChatType] = useState("Normal");
+    const navigate = useNavigate();
     const [showSearch, setShowSearch] = useState(false);
+    const { chatId } = useParams();
+    const updateRouteForChatInfo = ()=>{
+        console.log(chatId)
+        navigate(`/chat/info/${chatId}`)
+    }
+
     return (
         <div className="chatWindow__header">
-            <h3 className='chat-person-name'>Chat with User 1</h3>
+            <h3 className='chat-person-name' onClick={()=>{updateRouteForChatInfo()}}>Chat with User 1</h3>
             
             <div className='type-of-chat'>
                 <div 
