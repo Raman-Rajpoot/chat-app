@@ -17,7 +17,9 @@ function CreateGroup({ isOpen, onClose }) {
       const response = await userAPI.get('/get-my-friends', {
         withCredentials: true
       });
+      console.log(response)
       setFriends(response.data?.friends || []);
+      console.log(response.data?.friends)
     } catch (error) {
       console.error('Error fetching friends:', error);
     }

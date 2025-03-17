@@ -416,33 +416,40 @@ const getNotifications = async (req, res) => {
   }
 }
 
-
 const getMyFriends = async (req, res) => {
   try {
-    const {chatId} = req?.query;
-    console.log(chatId, req.user)
-    const chat = await Chat.find({members : req.user?._id, isGroupChat: false}).populate("members", "name email avatar").lean();
-   console.log("chat : ",chat)
-  
-    const friends = chat?.members?.filter(member => member?._id.toString() !== req.user?._id.toString())
-  .map(friend => ({
-    _id: friend?._id,
-    name: friend?.name,
-    email: friend?.email,
-    avatar: friend?.avatar?.url || ""
-  }));
-console.log("friends : ",friends)
-  if(chatId){
-    const chat = await Chat.findById(chatId);
-    
-    const availableFriends = friends.filter(friend => !chat.members.includes(friend._id));
-    return res.status(200).json({ friends: availableFriends, success: true });
-  }else{
-    return res.status(200).json({ friends, success: true });
-  }
+    // Get all private chats where user is a member
+    const chats = await Chat.find({
+      members: req.user?._id,
+      isGroupChat: false
+    }).populate("members", "name email avatar").lean();
+
+    // Extract all friends (excluding the current user)
+    const friends = chats.flatMap(chat => 
+      chat.members
+        .filter(member => member?._id.toString() !== req.user?._id.toString())
+        .map(friend => ({
+          _id: friend?._id,
+          name: friend?.name,
+          email: friend?.email,
+          avatar: friend?.avatar?.url || ""
+        }))
+    );
+
+    const uniqueFriends = Array.from(new Map(
+      friends.map(friend => [friend._id.toString(), friend])
+    ).values());
+
+    return res.status(200).json({ 
+      friends: uniqueFriends, 
+      success: true 
+    });
 
   } catch (error) {
-    return res.status(500).json({ message: "Error getting notifications", error });
+    return res.status(500).json({ 
+      message: "Error getting friends list", 
+      error: error.message 
+    });
   }
 }
 

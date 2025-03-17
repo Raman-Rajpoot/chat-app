@@ -6,6 +6,7 @@ import { User } from "../models/user.model.js";
 // const { ALERT, REFETCH_CHATS,NEW_ATTACHMENT, NEW_MESSAGE } = events;
 // import upload/ from "../middlewares/upload.middleware.js";
 import { Message } from "../models/message.model.js";
+import mongoose from "mongoose"; 
 
 const createGroupChat = async (req, res) => {
   try {
@@ -71,53 +72,163 @@ const getMyChats = async (req, res) => {
   }
 };
 
-
-// create route for get group created by me
-
-
-
-
 const addMembersToGroup = async (req, res) => {
   const { chatId, members } = req.body;
- 
-  if (!chatId || !members ||  members.length === 0) {
-    return res.status(400).json({ message: "ChatId and members are required" });
+  console.log('Add members request:', { chatId, members });
+
+  if (!chatId || !members?.length) {
+    return res.status(400).json({ 
+      message: "Chat ID and members array are required",
+      received: { chatId, memberCount: members?.length || 0 }
+    });
   }
 
-  try{
-    const chat = await Chat.findById(chatId);
-    if(!chat){
-      return res.status(404).json({ message: "Chat not found" });
-    }
-    if(chat.creator.toString() !== req.user._id.toString()){
-      return res.status(401).json({ message: "You are not authorized to add member to this group" });
-    }
-    if(!chat.isGroupChat){
-      return res.status(400).json({ message: "This is not a group chat" });
-    }
-    const filtermembers = members.filter(member => !chat.members.includes(member));
-
-    if (filtermembers.length === 0) {
-      return res.status(400).json({ message: "members are required" });
+  try {
+    // 1. Chat Validation
+    const chat = await Chat.findById(chatId).lean();
+    console.log('Chat found:', !!chat);
+    
+    if (!chat) {
+      return res.status(404).json({ 
+        message: "Chat not found",
+        chatId,
+        suggestion: "Verify the chat ID and user permissions"
+      });
     }
 
-   const allMembersPromise = filtermembers.map(memberId => User.findById(memberId, "name"));
-    const allMembers = await Promise.all(allMembersPromise);
-    chat.members.push(...allMembers.map(member => member._id));
-    if(chat.members.length > 100){
-      return res.status(400).json({ message: "Group chat can't have more than 100 members" });
+    // 2. Authorization Check
+    const isCreator = chat.creator.toString() === req.user._id.toString();
+    console.log('User is creator:', isCreator);
+    
+    if (!isCreator) {
+      return res.status(403).json({
+        message: "Unauthorized operation",
+        requiredRole: "chat creator",
+        currentUser: req.user._id
+      });
     }
-    await chat.save();
 
-    // emitEvent(req, ALERT, chat.members, { message: `You have been added to ${chat.chatName} group by ${req.user.name}` });
+    // 3. Group Chat Validation
+    if (!chat.isGroupChat) {
+      return res.status(400).json({
+        message: "Invalid chat type",
+        requiredType: "group chat",
+        currentType: "direct chat"
+      });
+    }
 
-    // emitEvent(req, REFETCH_CHATS, chat.members);
-    return res.status(200).json({ message: "Member added successfully", allMembers });
+    // 4. Member ID Processing
+    const validMembers = members.filter(id => 
+      mongoose.Types.ObjectId.isValid(id)
+    );
+    
+    if (validMembers.length !== members.length) {
+      const invalidIds = members.filter(id => 
+        !mongoose.Types.ObjectId.isValid(id)
+      );
+      
+      return res.status(400).json({
+        message: "Invalid member ID format",
+        invalidIds,
+        exampleValidId: new mongoose.Types.ObjectId(),
+        invalidCount: invalidIds.length
+      });
+    }
+
+    // 5. Convert to ObjectIDs
+    const targetUserIds = validMembers.map(id => new mongoose.Types.ObjectId(id));
+    console.log('Converted member IDs:', targetUserIds);
+
+    // 6. User Existence Check
+    const existingUsers = await User.find(
+      { _id: { $in: targetUserIds } },
+      { _id: 1, name: 1 }
+    ).lean();
+    
+    console.log('Found users:', existingUsers);
+
+    if (existingUsers.length !== targetUserIds.length) {
+      const foundIds = new Set(existingUsers.map(u => u._id.toString()));
+      const missingIds = validMembers.filter(id => !foundIds.has(id));
+      
+      return res.status(404).json({
+        message: "Some users not found",
+        missingIds,
+        existingCount: existingUsers.length,
+        requestedCount: targetUserIds.length
+      });
+    }
+
+    // 7. Existing Member Check
+    const currentMemberIds = new Set(chat.members.map(m => m.toString()));
+    console.log('Current member IDs:', [...currentMemberIds]);
+
+    const newMembers = existingUsers.filter(user => 
+      !currentMemberIds.has(user._id.toString())
+    );
+    
+    console.log('New members to add:', newMembers.map(m => m._id));
+
+    if (!newMembers.length) {
+      return res.status(400).json({
+        message: "No new members to add",
+        existingMembers: [...currentMemberIds],
+        attemptedAdditions: validMembers
+      });
+    }
+
+    // 8. Group Size Validation
+    const projectedSize = chat.members.length + newMembers.length;
+    console.log('Projected group size:', projectedSize);
+    
+    if (projectedSize > 100) {
+      return res.status(400).json({
+        message: "Group size limit exceeded",
+        currentSize: chat.members.length,
+        attemptedAdditions: newMembers.length,
+        maxAllowed: 100
+      });
+    }
+
+    // 9. Update Operation
+    const updateResult = await Chat.findByIdAndUpdate(
+      chatId,
+      { $addToSet: { members: { $each: newMembers.map(m => m._id) } } },
+      { new: true, runValidators: true }
+    ).populate('members', 'name email');
+    
+
+    // 10. Response Formatting
+    const addedMembers = newMembers.map(m => ({
+      _id: m._id,
+      name: m.name,
+      addedAt: new Date().toISOString()
+    }));
+
+    return res.status(200).json({
+      message: "Members added successfully",
+      addedCount: addedMembers.length,
+      addedMembers,
+      newTotalMembers: updateResult.members.length
+    });
+
+  } catch (error) {
+    console.error('Error stack:', error.stack);
+    
+    return res.status(500).json({
+      message: "Operation failed",
+      error: process.env.NODE_ENV === 'development' 
+        ? error.message 
+        : 'Internal server error',
+      requestDetails: {
+        chatId,
+        memberCount: members?.length,
+        userId: req.user?._id
+      }
+    });
   }
-  catch(error){
-    return res.status(500).json({ message: "Error adding member to group", error });
-  }
-}
+};
+
 
 const removeMember = async (req, res) => {
   const { chatId, member } = req.body;
@@ -174,7 +285,7 @@ const leaveGroup = async (req, res) => {
 
   try {
     const chat = await Chat.findById(chatId);
-    // console.log(chat);
+    console.log(chat);
     if (!chat) {
       return res.status(404).json({ message: "Chat not found" });
     }
