@@ -192,15 +192,22 @@ const Login = async (req, res) => {
   }
 };
 
-const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Logout Error:", err);
-      return res.status(500).json({ message: "Logout failed" });
-    }
-    res.clearCookie("connect.sid"); // Clear session cookie
+const logout =async (req, res) => {
+
+  try{
+   const user = await User.findById(req.user?._id);
+   if (!user) {
+    return res.status(404).json({ message: "User not found or already logged out" });
+   }
+    user.refreshToken = "";
+    await user.save();
+
     return res.status(200).json({ message: "Logged out successfully" });
-  });
+  }
+  catch (err) {
+      console.error("Logout Error:", err);
+      return res.status(500).json({ message: "Logout failed", error: err.message });
+    }
 };
 
 const getUser = async (req, res) => {

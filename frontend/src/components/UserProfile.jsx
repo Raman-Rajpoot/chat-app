@@ -6,10 +6,11 @@ import './UserProfile.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateData } from '../redux/features/user.feature';
 import userAPI from '../api/user.api';
+import { useNavigate } from 'react-router-dom';
 const UserProfile = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-
+  const navigate = useNavigate();
   const userData = useSelector((state) => state.userData);
   const dispatch = useDispatch();
 
@@ -21,7 +22,22 @@ const UserProfile = () => {
   const handleAdminRedirect = () => {
     console.log('Redirecting to admin panel...');
   };
+const logOut =async ()=>{
+  try{
+  const response = await userAPI.post('/logout',{withCredentials: true}) ;
 
+  if(response.data){
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
+    navigate('/login')
+  }
+}
+catch(error){
+  console.error("Logout Error:", error);
+  alert("Logout failed. Please try again.");  
+}
+}
  
 
   return (
@@ -71,7 +87,7 @@ const UserProfile = () => {
             </button>
           )}
 
-          <button className="logout-btn" >
+          <button className="logout-btn" onClick={()=>{logOut()}}>
             Logout
           </button>
         </div>
