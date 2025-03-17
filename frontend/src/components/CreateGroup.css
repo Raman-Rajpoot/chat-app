@@ -111,27 +111,46 @@
     font-weight: bold;
   }
   
-  .action-btn {
-    width: 30px;
-    height: 30px;
+  .action-btn-add-member {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* padding-bottom: 1em; */
     font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.2s;
+    object-fit: fill;
+  }
+  .action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* padding-bottom: 1em; */
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    object-fit: fill;
   }
   
-  .action-btn.add {
+  .action-btn-add-member.add {
     background: #00ff88;
     color: #1a1a1a;
   }
   
-  .action-btn.remove {
+  .action-btn-add-member.remove {
     background: #ff4444;
     color: white;
   }
   
-  .action-btn:hover {
+  .action-btn-add-member:hover {
     transform: scale(1.1);
   }
   

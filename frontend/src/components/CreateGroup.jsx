@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './CreateGroup.css';
 import userAPI from '../api/user.api.js';
 import { useSelector } from 'react-redux';
+import chatAPI from '../api/chat.api.js';
 
 function CreateGroup({ isOpen, onClose }) {
   const [selectedFriends, setSelectedFriends] = useState([]);
@@ -45,10 +46,11 @@ function CreateGroup({ isOpen, onClose }) {
 
   const handleCreateGroup = async () => {
     try {
-      await userAPI.post('/create-group', {
-        name: groupName,
-        members: selectedFriends.map(f => f._id)
+      await chatAPI.post('/new/group', {
+        chatName: groupName,
+        participants: selectedFriends.map(f => f._id)
       }, { withCredentials: true });
+      
       onClose();
     } catch (error) {
       console.error('Error creating group:', error);
@@ -117,7 +119,7 @@ function CreateGroup({ isOpen, onClose }) {
                       </div>
                     </div>
                     <button
-                      className={`action-btn ${isSelected ? 'remove' : 'add'}`}
+                      className={`action-btn-add-member ${isSelected ? 'remove' : 'add'}`}
                       onClick={() => handleToggleFriend(friend)}
                     >
                       {isSelected ? '-' : '+'}
