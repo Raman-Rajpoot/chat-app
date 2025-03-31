@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 
 import { Route, Routes, BrowserRouter as Router ,useNavigate} from 'react-router-dom';
-
-
+import "@liveblocks/react-ui/styles.css";
+import "@liveblocks/react-tiptap/styles.css";
+import './api/globals.css';
+// import './App.css';
 import NormalChatWindow from './components/NormalChatWindow.js';
 
 import CollabChatWindow from './components/CollabChatWindow.js';
@@ -29,7 +31,7 @@ const App = () => {
         }>
           <Route index element={<NormalChatWindow />} />
           <Route path='/chat/:chatId' element={<NormalChatWindow />} />
-          <Route path="collab" element={<CollabChatWindow />} />
+          <Route path="collab/:chatId" element={<CollabChatWindow />} />
           <Route path='/chat/info/:chatId' element={<ChatDetails />} />
         </Route>
         <Route path="/login" element={<Login />} />

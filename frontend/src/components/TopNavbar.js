@@ -17,19 +17,26 @@ function TopNavbar() {
 
     return (
         <div className="chatWindow__header">
-            <h3 className='chat-person-name' onClick={()=>{updateRouteForChatInfo()}}>Chat with User 1</h3>
+            <h3 className='chat-person-name' onClick={()=>{updateRouteForChatInfo()}}>Chat with User</h3>
             
             <div className='type-of-chat'>
                 <div 
                     className={`chat-type-btn ${chatType === 'Normal' ? 'selected' : ''}`}
-                    onClick={() => setChatType("Normal")}
+                    onClick={() =>{
+                        setChatType("Normal")
+                        navigate(`/chat/${chatId}`); 
+}}
                 >
                     Normal
                     <div className="glow-effect"></div>
                 </div>
                 <div 
                     className={`chat-type-btn ${chatType === 'Collaborative' ? 'selected' : ''}`}
-                    onClick={() => setChatType("Collaborative")}
+                    onClick={() => {
+                    setChatType("Collaborative");
+                    navigate(`/collab/${chatId}`);
+                    
+                    }}
                 >
                     Collab
                     <div className="glow-effect"></div>

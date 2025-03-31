@@ -11,7 +11,7 @@ import chatRouter from "./src/routes/chat.routes.js";
 import seedUsers from "./src/seeders/user.seeder.js";
 import {Server} from "socket.io";
 import { createServer } from "http";
-import { EDITORCHANGE, NEW_MESSAGE, NEW_MESSAGE_AlERT } from "./src/constants/events.js";
+import { COLLABMSG, NEW_MESSAGE, NEW_MESSAGE_AlERT } from "./src/constants/events.js";
 import { getSockets } from "./src/utils/socket.utils.js";
 import { Message } from "./src/models/message.model.js";
 ;
@@ -105,6 +105,7 @@ io.on("connection",async (socket) => {
         createdAt : new Date().toISOString()
      }
      const userSockets = getSockets(members);
+     console.log("Emitting COLLABMSG to sockets:", userSockets);
     io.to(userSockets).emit(NEW_MESSAGE, {
         message:  messageForRealTime ,
         chatId,
@@ -120,10 +121,20 @@ io.on("connection",async (socket) => {
    }
 
     });
-    socket.on(EDITORCHANGE, (data) => {
-        const userSockets = getSockets(members);
-        io.to(userSockets).emit('editorChange', data);
-    });
+
+// COLLABMSG event handling
+socket.on(COLLABMSG, ({ content, members }) => {
+    console.log("Received COLLABMSG:");
+    console.log("Content:", content);
+    console.log("Members:", members);
+
+    const userSockets = getSockets(members);
+    console.log("Emitting COLLABMSG to sockets:", userSockets);
+    // io.to(userSockets).emit(COLLABMSG, { members, content });
+    io.emit(COLLABMSG, { members, content });
+    console.log("COLLABMSG emitted successfully.");
+  });
+
     socket.on("disconnect", () => {
         console.log("user disconnected");
         userSocketIDs.delete(""+user._id);
