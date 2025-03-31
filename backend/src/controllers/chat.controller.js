@@ -379,47 +379,43 @@ const sendAttachment = async (req, res) => {
 };
 const getChats = async (req, res) => {
   try {
-    // Convert req.query.populate to a boolean
     const shouldPopulate = req.query.populate === "true";
-
+    const chatId = req.params.chatId; // Retrieve chatId from URL
+    
     if (shouldPopulate) {
-      console.log("Populating chats...");
+      console.log("Populating chat details for chat:", chatId);
       
-      const chats = await Chat.find({ members: req.user._id })
+      // Find a specific chat where chatId matches and the user is a member
+      const chat = await Chat.findOne({ _id: chatId, members: req.user._id })
         .populate("members", "name avatar")
         .lean();
 
-      if (!chats || chats.length === 0) {
-        return res.status(404).json({ message: "No chat found" });
+      if (!chat) {
+        return res.status(404).json({ message: "Chat not found" });
       }
 
       // Format members' avatar URLs before sending response
-      const formattedChats = chats.map(chat => ({
-        ...chat,
-        members: chat.members.map(({ _id, name, avatar }) => ({
-          _id,
-          name,
-          avatar: avatar?.url,  // Handle cases where avatar might be undefined
-        })),
+      chat.members = chat.members.map(({ _id, name, avatar }) => ({
+        _id,
+        name,
+        avatar: avatar?.url,
       }));
 
-      return res.status(200).json({ chats: formattedChats });
+      return res.status(200).json({ data: chat });
     } else {
-      console.log("Not populating chats...");
-
-      const chats = await Chat.find({ members: req.user._id });
-
-      if (!chats || chats.length === 0) {
-        return res.status(404).json({ message: "No chat found" });
+      console.log("Fetching chat details without population for chat:", chatId);
+      const chat = await Chat.findOne({ _id: chatId, members: req.user._id });
+      if (!chat) {
+        return res.status(404).json({ message: "Chat not found" });
       }
-
-      return res.status(200).json({ chats });
+      return res.status(200).json({ data: chat });
     }
   } catch (error) {
-    console.error("Error fetching chats:", error);
+    console.error("Error fetching chat:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 const renameGroup = async (req, res) => {
   const { chatName } = req.body;
@@ -498,7 +494,7 @@ const deleteChat = async (req, res) => {
 const getMesasages = async (req, res) => {
   try {
     const chatId = req.params.id;
-    const {page = 1} = req.query;
+    const {page } = req.query;
     const limit = 20
     const skip = (page - 1) * limit;
     console.log(chatId);
@@ -516,13 +512,16 @@ const getMesasages = async (req, res) => {
 
     const totalPages = Math.ceil(totalMessagesCount / limit);
     console.log(totalMessagesCount, totalPages);
+    console.log(messages)
 
-    return res.status(200).json({ messages : messages.reverse(), message: "Messages fetched successfully",success: true });
+
+    return res.status(200).json({ messages : messages ,totalPage :  totalPages, message: "Messages fetched successfully",success: true });
 
   } catch (error) {
     return res.status(500).json({ message: "Error fetching messages", error });
   }
 }
+
 const getChatDetails = async (req, res) => {
   try {
     const { chatId } = req.params;
@@ -560,6 +559,28 @@ const getChatDetails = async (req, res) => {
   }
 };
 
+const deleteMessage = async(req, res) => {
+  const { messageId } = req.body;
+  console.log(messageId);
+  if (!messageId) {
+    return res.status(400).json({ message: "MessageId is required" });
+  }
+
+  try {
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+    if (message.sender.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: "You are not authorized to delete this message" });
+    }
+    await Message.findByIdAndDelete(messageId);
+    return res.status(200).json({ message: "Message deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error deleting message", error });
+  }
+} 
+
 export default{
   createGroupChat,
   getMyChats,
@@ -571,5 +592,6 @@ export default{
   renameGroup,
   deleteChat,
   getMesasages,
-  getChatDetails
+  getChatDetails,
+  deleteMessage,
  };

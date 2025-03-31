@@ -1,4 +1,4 @@
-import React, { useEffect, useState,  } from 'react';
+import React, { use, useEffect, useState,  } from 'react';
 import { useNavigate } from "react-router";
 import './Sidebar.css';
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +29,10 @@ function Sidebar() {
   const filteredUsers = friendData.filter(user =>
     user.chatName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+ 
+
+  
+
 
   const getChat = async () => {
     try {

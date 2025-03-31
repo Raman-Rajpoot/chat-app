@@ -11,10 +11,13 @@
 .NormalchatWindow__body {
   flex: 1;
   padding: 20px;
-  overflow-y: auto;
+  overflow: auto;
   background-color: #121212;
   background-image: radial-gradient(circle at center, #1a1a1a 1px, transparent 1px);
   background-size: 20px 20px;
+display: flex;
+
+  flex-direction: column-reverse;
 }
 
 .NormalchatWindow__footer {

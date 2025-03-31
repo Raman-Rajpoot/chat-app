@@ -11,7 +11,7 @@ import chatRouter from "./src/routes/chat.routes.js";
 import seedUsers from "./src/seeders/user.seeder.js";
 import {Server} from "socket.io";
 import { createServer } from "http";
-import { NEW_MESSAGE, NEW_MESSAGE_AlERT } from "./src/constants/events.js";
+import { EDITORCHANGE, NEW_MESSAGE, NEW_MESSAGE_AlERT } from "./src/constants/events.js";
 import { getSockets } from "./src/utils/socket.utils.js";
 import { Message } from "./src/models/message.model.js";
 ;
@@ -19,6 +19,7 @@ import { Message } from "./src/models/message.model.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
+import socketAuthMiddleware from "./src/middlewares/socket.middleware.js";
 
 
 // Initializations
@@ -26,8 +27,9 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: process.env.CLIENT_URL,
         methods: ["GET", "POST"],
+        credentials: true,
     },
 });
 
@@ -48,25 +50,7 @@ app.use(
 app.use(express.json()); 
 app.use(cookieParser());
 
-// app.use(
-//     session({
-//       secret: process.env.SESSION_SECRET,
-//       resave: false,
-//       saveUninitialized: false,
-//       cookie: {
-//         maxAge: 3600000, // 1 hour
-//         httpOnly: true,
-//         secure: process.env.NODE_ENV === 'production', // Use secure cookies only in production (HTTPS)
-//         sameSite: 'lax', // or 'none' (if using cross-site and secure: true)
-//       },
-//       store: MongoStore.create({
-//         mongoUrl: process.env.MONGO_URL,
-//         collectionName: "sessions",
-//       }),
-//     })
-//   );
-  
-  
+socketAuthMiddleware(io);
 
 // Database connection
 connectDB()
@@ -88,19 +72,31 @@ export const userSocketIDs = new Map();    // {socketId: roomId}
 io.on("connection",async (socket) => {
     console.log("a user connected",socket.id);
 
-    const user = {
-        _id: "123",
-        name: " raman",
-    };
-
+    const user = socket.user
+   console.log("user : ",user);
    userSocketIDs.set(user._id.toString(),socket.id);
 
 
     socket.on(NEW_MESSAGE,async({chatId, members, message}) => {
+        console.log("message : ",message);
+        console.log("chatId : ",chatId);
+        console.log("members : ",members);
+    
 
+     const messageForDB = {
+        chat: chatId,
+        content : message,
+        sender : user._id,
+     }
+
+     try{
+        const newMessage = new Message(messageForDB);
+        await newMessage.save();
+        
      const messageForRealTime = {
         chat: chatId, 
-        _id : uuid,
+        _id : newMessage._id,
+        
         content : message,
         sender : {
             _id : user._id,
@@ -108,13 +104,6 @@ io.on("connection",async (socket) => {
         },
         createdAt : new Date().toISOString()
      }
-
-     const messageForDB = {
-        chat: chatId,
-        content : message,
-        sender : user._id,
-     }
-     
      const userSockets = getSockets(members);
     io.to(userSockets).emit(NEW_MESSAGE, {
         message:  messageForRealTime ,
@@ -122,17 +111,19 @@ io.on("connection",async (socket) => {
     });
     io.to(userSockets).emit(NEW_MESSAGE_AlERT, {chatId});  
 
-   try{
-        const newMessage = new Message(messageForDB);
-        await newMessage.save();
+   
+        
+   io.emit(NEW_MESSAGE,  messageForRealTime );
     }catch(err){
         console.log(err);
         
    }
-        
-   io.emit(NEW_MESSAGE,  messageForRealTime );
-    });
 
+    });
+    socket.on(EDITORCHANGE, (data) => {
+        const userSockets = getSockets(members);
+        io.to(userSockets).emit('editorChange', data);
+    });
     socket.on("disconnect", () => {
         console.log("user disconnected");
         userSocketIDs.delete(""+user._id);

@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import './Message.css';
+import { useSelector } from 'react-redux';
+import chatAPI from '../api/chat.api';
 
-function Message({ user, text, time, onDelete }) {
+function Message({ sender_id,sender_name, text, time, onDelete }) {
   const [status, setStatus] = useState('sent');
   const [isHovered, setIsHovered] = useState(false);
+  const user = useSelector((state) => state.userData);
+
+ 
 
   return (
     <div 
-      className={`message-container ${user === "You" ? "message__sender" : ""}`}
+      className={`message-container ${sender_id === user._id ? "message__sender" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Delete Icon (left side) */}
-      {user === "You" && (
+      {sender_id === user._id && (
         <div 
           className={`delete-icon ${isHovered ? 'visible' : ''}`}
           onClick={(e) => {
@@ -31,7 +36,7 @@ function Message({ user, text, time, onDelete }) {
 
       <div className={`message ${isHovered ? 'shifted' : ''}`}>
         <p className="message-text">
-          <strong>{user}:</strong> {text}
+          <strong>{sender_name}:</strong> {text}
         </p>
         <div className="message-metadata">
           <p className="message-status">{status}</p>

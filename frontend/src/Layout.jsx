@@ -6,15 +6,16 @@ import UserProfile from './components/UserProfile.jsx';
 import userAPI from './api/user.api.js';
 import { useDispatch, useSelector } from "react-redux";
 import { updateData } from './redux/features/user.feature.js';
+import { useSocket } from './api/socket.api.js';
 
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 const Layout = () => {
 const navigate = useNavigate()
  const dispatch = useDispatch();
  const userData = useSelector((state) => state.userData);
-   
 
+ const socket = useSocket()
+console.log(socket.id)
 const getUser = async() => {
   try {
     const response = await userAPI.get('/getuser',{ withCredentials: true }); 
@@ -41,16 +42,19 @@ const getUser = async() => {
   getUser();
  }, [dispatch]);
 
-
+ 
   return (
     <div className="app">
        <div className="app__body">
+       
+
       <Navbar />
         <Sidebar />
        
           <Outlet />
        
         <UserProfile />
+     
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import userAPI from '../src/api/user.api.js'
 import { updateData } from '../src/redux/features/user.feature.js';
 import ChatDetails from './components/ChatDetails.jsx';
+import { SocketProvider } from './api/socket.api.js';
 
 const App = () => {
  const dispatch = useDispatch();
@@ -21,7 +22,11 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={
+          <SocketProvider>
+              <Layout />
+          </SocketProvider>
+        }>
           <Route index element={<NormalChatWindow />} />
           <Route path='/chat/:chatId' element={<NormalChatWindow />} />
           <Route path="collab" element={<CollabChatWindow />} />
